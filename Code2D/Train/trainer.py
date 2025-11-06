@@ -82,7 +82,8 @@ def train_model(train_config: dict, model: torch.nn.Module,
         if scheduler and epoch >= warm_up_epochs:
             if isinstance(scheduler, torch.optim.lr_scheduler.ReduceLROnPlateau):
                 # ReduceLROnPlateau 需要传入验证集指标
-                scheduler.step(val_metrics['loss'])  
+                scheduler.step(val_metrics['metrics']['dice'])  
+                # scheduler.step(val_metrics['loss'])  
             else:
                 # 其他调度器只需简单调用 step()
                 scheduler.step()

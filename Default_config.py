@@ -56,11 +56,11 @@ def get_defult_config():
     # ------------------- 学习率调度器配置 -------------------
     schedulerconfig = {
         "name": "ReduceLROnPlateau",
-        "mode": "min",
+        "mode": "max",
         "factor": 0.6,
-        "patience": 3,
-        "threshold": 0.01,
-        "cooldown": 0,
+        "patience": 7,
+        "threshold": 0.001,
+        "cooldown": 1,
         "threshold_mode": "abs",
         "min_lr": 1e-6,
         "eps": 1e-8
@@ -99,7 +99,7 @@ def get_defult_config():
 
     # ------------------- 早停机制配置 -------------------
     earlystopconfig = {
-        "patience": 10,
+        "patience": 20,
         "delta": 0.0008,
         "mode": "max",
         "model_save_path": os.path.join(log_path, "best_model.pth")
