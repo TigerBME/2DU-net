@@ -162,6 +162,37 @@ class AttentionUnet(nn.Module):
         final = self.final(dec1)
         return final
 
+    def freeze_encoder(self):
+        encoder_layers = [
+            self.enc_input,
+            self.encoder1,
+            self.encoder2,
+            self.encoder3,
+            self.encoder4,
+            self.downsample
+        ]
+        for layer in encoder_layers:
+            for param in layer.parameters():
+                param.requires_grad = False
+
+        print("Encoder layers are frozen.")
+
+    def unfreeze_encoder(self):
+        encoder_layers = [
+            self.enc_input,
+            self.encoder1,
+            self.encoder2,
+            self.encoder3,
+            self.encoder4,
+            self.downsample
+        ]
+        for layer in encoder_layers:
+            for param in layer.parameters():
+                param.requires_grad = True
+
+        print("Encoder layers are unfrozen.")
+
+        
 def _create_attention_unet(config: Dict) -> nn.Module:
     """创建 attention_unet(CSNet) 的具体实现"""
     try:
