@@ -1,4 +1,4 @@
-# Loss/mse_loss.py
+# Loss/MSE_loss.py
 import torch.nn as nn
 import torch
 import torch.nn.functional as F

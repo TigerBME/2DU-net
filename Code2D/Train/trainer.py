@@ -51,8 +51,9 @@ def train_model(train_config: dict, model: torch.nn.Module,
         )
         
         # 验证阶段
+        train_kind = train_config.get('train_kind')
         val_metrics = _validate_model(
-            model, val_loader, criterion, device
+            model, val_loader, criterion, device, train_kind=train_kind
         )
         
         # 记录指标
@@ -66,7 +67,9 @@ def train_model(train_config: dict, model: torch.nn.Module,
             **val_metrics['metrics']
         }
         logger.log_metrics(log_data)
-        print(f"Dice = {val_metrics['metrics']['dice']}")
+    
+        if train_kind != 'selftrain':
+            print(f"Dice = {val_metrics['metrics']['dice']}")
 
         # 检查早停和学习率调整
         early_stop_return_config =  earlystopper.check_early_stop(val_metrics['metrics']['dice'], model)
@@ -127,7 +130,7 @@ def _train_epoch(model,
     
     return total_loss/len(loader), current_lr
 
-def _validate_model(model, loader, criterion, device):
+def _validate_model(model, loader, criterion, device, train_kind: str='train'):
     """执行模型验证"""
 
     frontlength = 25
@@ -135,7 +138,10 @@ def _validate_model(model, loader, criterion, device):
 
     model.eval()
     total_loss = 0
-    metrics = {'dice': 0, 'sensitivity': 0, 'specificity': 0, 'accuracy': 0}
+    if train_kind == 'selftrain':
+        metrics = {'dice': 0, 'mean_confidence': 0,'mean_entropy': 0}
+    else:
+        metrics = {'dice': 0, 'sensitivity': 0, 'specificity': 0, 'accuracy': 0}
     
     with torch.no_grad():
         description = "Validating"
@@ -149,7 +155,11 @@ def _validate_model(model, loader, criterion, device):
             total_loss += loss.item()
             
             # 计算指标
-            batch_metrics = _calculate_metrics(outputs, targets)
+            if train_kind == 'selftrain':
+                batch_metrics = _calculate_unsupervised_metrics(outputs)    
+            else:
+                batch_metrics = _calculate_metrics(outputs, targets)
+
             for k in metrics:
                 metrics[k] += batch_metrics[k] * inputs.size(0)
 
@@ -183,6 +193,34 @@ def _calculate_metrics(pred, target, threshold=0.5):
         'sensitivity': sensitivity.item(),
         'specificity': specificity.item(),
         'accuracy': accuracy.item()
+    }
+
+def _calculate_unsupervised_metrics(pred):
+    """
+    计算无监督评估指标：
+    1. 平均置信度（mean confidence）
+    2. 平均预测熵（mean entropy）
+    
+    pred: raw logits (模型输出，未经过 sigmoid)
+    """
+    # 概率
+    prob = torch.sigmoid(pred)
+
+    # ---------- 1. 平均置信度 ----------
+    # 对于每个像素，置信度 = max(p, 1-p)
+    confidence = torch.max(prob, 1 - prob)
+    mean_confidence = confidence.mean()
+
+    # ---------- 2. 平均预测熵 ----------
+    # H = - p log(p) - (1-p) log(1-p)
+    eps = 1e-8
+    entropy = -(prob * torch.log(prob + eps) + (1 - prob) * torch.log(1 - prob + eps))
+    mean_entropy = entropy.mean()
+
+    return {
+        'dice':  -mean_entropy.item(),
+        'mean_confidence': mean_confidence.item(),
+        'mean_entropy': mean_entropy.item()
     }
 
 def _warmup_lr(optimizer, base_lr, epoch, total):

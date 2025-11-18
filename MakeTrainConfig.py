@@ -54,6 +54,17 @@ train_data_enhance = [
         "target": "both"
     },
     {
+        "type": "RandomMask",
+        "params": {
+            "p_large": 0.3,
+            "p_small": 0.2,
+            "angle_range": [0, 360],
+            "move_range": [170, 180],
+            "radius_range": [320, 340]
+        },
+        "target": "both"
+    },
+    {
         "type": "ToTensor",
         "target": "both"
     },
@@ -78,7 +89,7 @@ dataconfig = {
             'label': labeltype
         },
         'dataloader_args': {
-            'batch_size': 4,
+            'batch_size': 8,
             'shuffle': True,
             'num_workers': 4
         }
@@ -89,6 +100,16 @@ dataconfig = {
         'preprocess': [
             {'type': 'Resize', 'params': {'size': target_size}, 'target': 'both'},
             {'type': 'RandomEqualize', 'params': {'p': 1.0}, 'target': 'image'},
+            {"type": "RandomMask","params": 
+                {
+                    "p_large": 0.3,
+                    "p_small": 0.2,
+                    "angle_range": [0, 360],
+                    "move_range": [170, 180],
+                    "radius_range": [320, 340]
+                },
+                "target": "both"
+            },
             {'type': 'ToTensor', 'target': 'both'}
         ],
         'picture_type': {
@@ -96,7 +117,7 @@ dataconfig = {
             'label': labeltype
         },
         'dataloader_args': {
-            'batch_size': 4,
+            'batch_size': 8,
             'shuffle': False,
             'num_workers': 2
         }
@@ -119,22 +140,22 @@ dataconfig = {
     }
 }
 
-# # 动态生成数据路径
-# device = "cuda" if cuda_available() else "cpu"
+# 动态生成数据路径
+device = "cuda" if cuda_available() else "cpu"
 
 
-# # OCTA2D
-# print("Start making Data...")
-# if device == "cuda":
-#     # data_path = r"C:\\Users\\Dell\\Desktop\\WDprogram\\OCTA2D"
-#     data_path = r"/root/WangDao/Data"
-# else:
-#     data_path = r"D:\\C_File\\WDdata\\OCTA2D"
+# OCTA2D
+print("Start making Data...")
+if device == "cuda":
+    # data_path = r"C:\\Users\\Dell\\Desktop\\WDprogram\\OCTA2D"
+    data_path = r"/root/WangDao/Data"
+else:
+    data_path = r"D:\\C_File\\WDdata\\OCTA2D"
 
 
 # 无卡开机时，直接指定数据路径
 # data_path = r"D:\\C_File\\WDdata\\OCTA2D"
-data_path = r"/root/WangDao/Data"
+# data_path = r"/root/WangDao/Data"
 
 
 # 定义四个子目录

@@ -1,7 +1,7 @@
 from datetime import datetime
 import os
 from Code2D.ConfigTool import getpath
-from Code2D.Model import DEFAULT_CONFIG_UNET as DEFAULT_MODEL_CONFIG
+from Code2D.Model import DEFAULT_CONFIG_ATTENTION_UNET as DEFAULT_MODEL_CONFIG
 
 def get_defult_config():
     imagetype = 'L'
@@ -22,20 +22,13 @@ def get_defult_config():
         "name": "CombinedLoss",
         "loss": [
             {
-                "name": "DiceLoss",
-                "weight": 0.9,
+                "name": "ConfidenceThresholdLoss",
+                "weight": 1.0,
                 "args": {
-                    "smooth": 1e-5,
+                    "low_th": 0.3,
+                    "high_th": 0.7,
                     "sigmoid": True,
                     "reduction": "mean"
-                }
-            },
-            {
-                "name": "BCELoss",
-                "weight": 0.1,
-                "args": {
-                    "reduction": "mean",
-                    "pos_weight": 5
                 }
             }
         ]
@@ -45,36 +38,32 @@ def get_defult_config():
     # ------------------- 优化器配置 -------------------
     opconfig = {
         "name": "AdamW",
-        "lr": 0.001,             # 保持不变，AdamW对lr不敏感
-        "betas": [0.9, 0.999],   # 一般不改
+        "lr": 0.0001,
+        "betas": [0.9, 0.999],
         "eps": 1e-08,
-        "weight_decay": 1e-4     # 核心变化：启用权重衰减
+        "weight_decay": 1e-4
     }
     config['optimizer'] = opconfig
 
 
     # ------------------- 学习率调度器配置 -------------------
     schedulerconfig = {
-        "name": "ReduceLROnPlateau",
-        "mode": "max",
-        "factor": 0.6,
-        "patience": 7,
-        "threshold": 0.001,
-        "cooldown": 1,
-        "threshold_mode": "abs",
-        "min_lr": 1e-6,
-        "eps": 1e-8
+        "name": "PolyLR",            # ← 改为 poly
+        "power": 0.9,                # ← poly 标准参数
+        "max_epoch": 10,            # ← poly 需要总 epoch 数
     }
 
     config['scheduler'] = schedulerconfig
 
     # ------------------- 训练参数配置 -------------------
     trainconfig = {
-        "epochs": 50,
+        "epochs": 10,                # ← 设置为约 10 个 epoch
         "accumulation_steps": 1,
-        "warm_up_epochs": 3,
+        "warm_up_epochs": 0,         # ← poly 通常不使用 warmup，故改为0
+        "train_kind": "selftrain",
     }
     config['training'] = trainconfig
+
 
     # ------------------- 日志配置 -------------------
     log_path = getpath('Records','record')
@@ -88,9 +77,11 @@ def get_defult_config():
             'dice':True,
             'lr':True,
             'time':True,
-            'sensitivity': True, 
-            'specificity': True, 
-            'accuracy': True
+            'sensitivity': False, 
+            'specificity': False, 
+            'accuracy': False,
+            'mean_entropy': True,
+            'mean_confidence': True,
         },
         "save_best_only": True,
         "overwrite": False
@@ -110,3 +101,4 @@ def get_defult_config():
 
 if __name__ == '__main__':
     config = get_defult_config()
+

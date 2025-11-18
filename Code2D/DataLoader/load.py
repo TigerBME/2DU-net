@@ -1,9 +1,13 @@
 from torch.utils.data import DataLoader
 from PIL import Image
+import sys
 import torchvision.transforms as transforms
 from . import Custom_transforms
 from .TrainDataset import CustomDataset
 from .PredictionDataset import PredictionDataset
+from .SelfTrainDataset import UnlabeledDataset
+
+current_module = sys.modules[__name__]
 
 def build_transforms(transform_config:list[dict]):
     """
@@ -57,12 +61,16 @@ def get_dataloader(data_config:dict, mode:str):
     '''
     if mode == 'test':
         # 测试数据预处理
-        test_transform = build_transforms(data_config['preprocess']['image'])
+        data_transforms, transforms_targets = build_transforms(data_config['preprocess'])
         
+        if "label" in transforms_targets:
+            # 测试集不应当出现以标签为目标的预处理
+            raise ValueError("Test dataset should not have label transform")
+
         # 测试数据集
         test_dataset = PredictionDataset(
             data_list=data_config['data'],
-            transform=test_transform,
+            transform=data_transforms,
             image_type=data_config['picture_type']
         )
         
@@ -79,7 +87,9 @@ def get_dataloader(data_config:dict, mode:str):
         # label_transforms = build_transforms(data_config['preprocess']['label'])
         
         # 初始化数据集
-        dataset = CustomDataset(
+        Dataset = getattr(current_module, data_config['dataset_type'])
+
+        dataset = Dataset(
             data_list=data_config['data'],
             data_transform=data_transforms,
             transform_targets=transforms_targets,

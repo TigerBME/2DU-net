@@ -101,7 +101,7 @@ class ASPPModule(nn.Module):
         self.global_avg_pool = nn.Sequential(
             nn.AdaptiveAvgPool2d((1, 1)),
             nn.Conv2d(in_channels, out_channels, kernel_size=1, bias=False),
-            # nn.BatchNorm2d(out_channels),
+            nn.BatchNorm2d(out_channels),
             nn.ReLU(inplace=False)
         )
         
@@ -155,8 +155,8 @@ class ASPPUnet(nn.Module):
         initialize_weights(self)
 
     def forward(self, x):
-        enc_input = self.enc_input(x)
-        down1 = self.downsample(enc_input)
+        enc0 = self.enc_input(x)
+        down1 = self.downsample(enc0)
 
         enc1 = self.encoder1(down1)
         down2 = self.downsample(enc1)
@@ -188,7 +188,7 @@ class ASPPUnet(nn.Module):
         dec2 = self.decoder2(up2)
 
         up1 = self.deconv1(dec2)
-        up1 = torch.cat((enc_input, up1), dim=1)
+        up1 = torch.cat((enc0, up1), dim=1)
         dec1 = self.decoder1(up1)
 
         final = self.final(dec1)

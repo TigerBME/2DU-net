@@ -7,6 +7,7 @@ from torch import nn
 from .DiceLoss import DiceLoss
 from .BCELoss import BCELoss
 from .MSELoss import MSELoss
+from .ConTloss import ConfidenceThresholdLoss
 
 current_module = sys.modules[__name__]
 

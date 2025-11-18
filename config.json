@@ -1,50 +1,28 @@
 {
     "model": {
-        "model_type": "unet",
+        "model_type": "attentionunet",
         "spatial_dims": 2,
         "in_channels": 1,
-        "out_channels": 1,
-        "channels": [
-            64,
-            128,
-            256,
-            512
-        ],
-        "strides": [
-            1,
-            2,
-            2
-        ],
-        "num_res_units": 2,
-        "dropout": 0.1,
-        "act": "RELU",
-        "norm": "INSTANCE"
+        "out_channels": 1
     },
     "loss": {
         "name": "CombinedLoss",
         "loss": [
             {
-                "name": "DiceLoss",
-                "weight": 0.9,
+                "name": "ConfidenceThresholdLoss",
+                "weight": 1.0,
                 "args": {
-                    "smooth": 1e-05,
+                    "low_th": 0.3,
+                    "high_th": 0.7,
                     "sigmoid": true,
                     "reduction": "mean"
-                }
-            },
-            {
-                "name": "BCELoss",
-                "weight": 0.1,
-                "args": {
-                    "reduction": "mean",
-                    "pos_weight": 5
                 }
             }
         ]
     },
     "optimizer": {
         "name": "AdamW",
-        "lr": 0.001,
+        "lr": 0.0001,
         "betas": [
             0.9,
             0.999
@@ -53,23 +31,18 @@
         "weight_decay": 0.0001
     },
     "scheduler": {
-        "name": "ReduceLROnPlateau",
-        "mode": "min",
-        "factor": 0.5,
-        "patience": 3,
-        "threshold": 0.01,
-        "cooldown": 0,
-        "threshold_mode": "abs",
-        "min_lr": 1e-06,
-        "eps": 1e-08
+        "name": "PolyLR",
+        "power": 0.9,
+        "max_epoch": 10
     },
     "training": {
-        "epochs": 50,
+        "epochs": 10,
         "accumulation_steps": 1,
-        "warm_up_epochs": 3
+        "warm_up_epochs": 0,
+        "train_kind": "selftrain"
     },
     "logging": {
-        "log_dir": "./Records\\record7",
+        "log_dir": "./Records\\record24",
         "metrics_to_log": {
             "epoch": true,
             "train_loss": true,
@@ -85,15 +58,15 @@
         "overwrite": false
     },
     "early_stopping": {
-        "patience": 10,
+        "patience": 20,
         "delta": 0.0008,
         "mode": "max",
-        "model_save_path": "Records\\record7\\best_model.pth"
+        "model_save_path": "Records\\record24\\best_model.pth"
     },
     "data": {
         "train": {
-            "Use_dataenhance": true,
-            "data_per_picture": 4,
+            "Use_dataenhance": false,
+            "data_per_picture": 1,
             "preprocess": [
                 {
                     "type": "Resize",
@@ -113,1652 +86,1556 @@
                     "target": "image"
                 },
                 {
-                    "type": "RandomRotate",
-                    "params": {
-                        "p": 0.6,
-                        "max_angle": 30
-                    },
-                    "target": "both"
-                },
-                {
-                    "type": "RandomFlip",
-                    "params": {
-                        "p": 0.5,
-                        "direction": "horizontal"
-                    },
-                    "target": "both"
-                },
-                {
-                    "type": "RandomFlip",
-                    "params": {
-                        "p": 0.5,
-                        "direction": "vertical"
-                    },
-                    "target": "both"
-                },
-                {
                     "type": "ToTensor",
                     "target": "both"
-                },
-                {
-                    "type": "AddGaussianNoise",
-                    "params": {
-                        "p": 0.5,
-                        "mean": 0,
-                        "var": 0.01
-                    },
-                    "target": "image"
                 }
             ],
+            "dataset_type": "UnlabeledDataset",
             "picture_type": {
                 "image": "L",
                 "label": "L"
             },
             "dataloader_args": {
-                "batch_size": 4,
+                "batch_size": 8,
                 "shuffle": true,
                 "num_workers": 4
             },
             "data": [
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10481.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10481.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0031.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10358.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10358.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0039.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10423.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10423.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0109.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10301.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10301.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0589.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10183.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10183.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0160.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10383.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10383.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0564.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10264.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10264.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0226.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10437.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10437.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0425.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10274.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10274.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0639.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10107.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10107.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0340.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10268.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10268.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0201.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10142.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10142.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0499.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10064.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10064.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0412.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10388.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10388.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0363.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10455.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10455.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0561.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10243.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10243.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0342.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10424.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10424.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0019.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10174.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10174.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0268.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10061.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10061.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0476.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10178.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10178.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0152.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10063.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10063.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0059.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10418.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10418.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0254.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10255.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10255.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0522.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10348.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10348.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0278.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10317.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10317.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0431.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10105.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10105.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0024.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10447.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10447.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0238.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10341.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10341.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0534.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10120.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10120.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0625.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10314.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10314.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0008.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10113.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10113.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0028.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10082.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10082.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0101.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10192.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10192.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0549.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10393.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10393.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0457.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10338.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10338.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0056.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10279.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10279.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0470.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10379.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10379.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0316.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10284.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10284.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0629.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10265.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10265.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0177.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10490.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10490.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0501.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10346.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10346.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0355.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10110.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10110.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0368.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10046.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10046.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0121.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10007.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10007.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0440.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10175.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10175.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0221.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10156.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10156.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0280.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10151.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10151.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0419.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10164.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10164.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0539.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10218.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10218.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0353.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10239.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10239.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0447.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10161.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10161.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0443.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10373.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10373.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0147.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10347.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10347.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0122.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10263.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10263.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0606.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10066.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10066.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0418.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10026.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10026.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0135.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10133.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10133.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0441.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10030.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10030.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0223.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10088.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10088.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0360.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10039.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10039.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0331.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10276.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10276.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0640.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10094.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10094.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0477.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10208.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10208.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0202.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10486.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10486.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0456.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10115.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10115.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0203.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10092.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10092.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0359.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10181.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10181.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0394.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10329.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10329.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0222.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10005.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10005.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0034.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10434.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10434.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0390.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10019.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10019.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0354.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10138.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10138.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0582.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10459.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10459.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0376.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10479.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10479.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0287.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10228.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10228.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0609.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10004.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10004.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0175.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10219.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10219.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0180.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10073.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10073.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0169.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10022.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10022.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0120.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10135.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10135.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0489.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10167.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10167.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0092.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10125.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10125.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0086.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10101.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10101.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0171.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10360.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10360.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0575.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10366.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10366.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0455.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10058.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10058.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0601.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10293.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10293.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0504.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10010.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10010.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0503.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10245.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10245.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0150.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10170.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10170.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0387.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10162.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10162.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0290.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10439.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10439.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0531.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10103.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10103.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0003.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10157.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10157.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0555.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10014.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10014.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0130.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10449.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10449.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0081.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10466.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10466.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0462.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10339.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10339.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0128.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10272.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10272.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0636.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10493.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10493.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0185.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10168.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10168.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0383.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10214.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10214.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0228.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10359.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10359.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0247.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10171.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10171.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0631.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10065.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10065.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0583.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10440.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10440.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0377.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10145.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10145.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0323.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10451.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10451.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0329.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10238.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10238.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0580.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10017.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10017.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0556.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10444.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10444.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0260.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10262.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10262.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0498.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10362.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10362.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0205.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10353.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10353.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0529.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10450.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10450.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0602.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10327.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10327.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0438.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10419.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10419.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0051.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10397.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10397.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0525.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10417.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10417.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0516.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10180.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10180.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0148.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10158.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10158.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0007.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10326.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10326.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0428.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10336.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10336.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0603.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10454.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10454.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0083.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10212.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10212.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0126.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10018.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10018.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0524.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10335.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10335.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0050.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10077.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10077.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0181.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10207.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10207.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0542.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10221.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10221.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0054.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10119.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10119.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0491.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10331.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10331.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0184.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10045.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10045.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0114.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10152.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10152.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0125.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10016.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10016.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0213.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10222.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10222.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0119.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10041.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10041.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0217.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10461.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10461.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0063.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10159.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10159.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0172.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10457.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10457.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0336.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10328.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10328.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0304.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10154.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10154.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0229.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10385.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10385.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0459.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10230.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10230.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0472.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10499.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10499.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0012.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10055.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10055.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0450.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10188.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10188.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0289.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10177.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10177.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0595.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10324.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10324.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0400.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10057.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10057.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0408.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10408.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10408.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0197.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10025.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10025.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0405.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10050.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10050.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0230.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10109.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10109.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0263.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10467.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10467.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0587.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10483.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10483.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0110.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10231.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10231.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0460.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10472.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10472.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0273.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10127.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10127.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0076.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10298.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10298.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0632.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10345.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10345.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0537.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10310.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10310.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0541.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10330.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10330.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0378.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10202.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10202.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0500.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10294.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10294.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0005.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10495.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10495.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0519.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10426.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10426.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0596.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10318.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10318.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0403.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10304.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10304.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0469.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10184.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10184.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0091.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10223.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10223.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0064.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10021.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10021.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0127.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10295.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10295.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0413.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10367.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10367.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0194.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10370.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10370.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0332.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10027.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10027.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0153.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10189.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10189.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0271.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10191.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10191.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0553.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10185.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10185.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0315.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10137.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10137.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0074.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10206.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10206.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0108.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10179.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10179.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0018.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10211.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10211.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0272.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10498.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10498.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0528.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10280.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10280.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0410.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10289.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10289.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0379.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10394.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10394.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0131.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10203.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10203.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0144.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10042.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10042.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0630.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10024.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10024.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0617.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10141.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10141.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0231.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10062.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10062.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0585.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10384.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10384.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0346.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10445.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10445.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0371.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10117.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10117.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0567.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10096.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10096.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0496.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10275.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10275.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0594.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10104.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10104.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0255.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10271.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10271.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0638.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10047.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10047.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0060.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10153.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10153.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0293.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10148.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10148.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0369.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10458.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10458.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0600.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10186.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10186.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0166.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10040.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10040.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0156.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10292.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10292.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0045.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10351.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10351.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0461.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10079.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10079.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0142.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10173.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10173.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0343.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10118.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10118.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0478.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10116.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10116.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0569.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10400.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10400.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0437.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10468.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10468.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0195.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10098.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10098.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0020.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10378.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10378.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0610.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10095.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10095.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0218.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10232.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10232.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0341.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10143.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10143.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0234.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10204.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10204.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0318.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10160.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10160.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0198.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10048.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10048.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0259.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10237.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10237.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0261.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10131.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10131.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0168.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10241.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10241.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0283.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10252.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10252.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0011.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10414.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10414.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0320.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10083.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10083.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0200.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10300.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10300.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0208.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10407.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10407.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0080.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10035.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10035.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0444.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10288.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10288.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0538.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10464.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10464.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0140.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10442.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10442.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0246.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10106.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10106.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0085.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10416.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10416.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0082.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10227.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10227.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0302.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10111.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10111.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0250.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10480.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10480.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0062.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10190.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10190.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0241.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10165.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10165.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0429.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10431.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10431.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0623.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10476.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10476.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0590.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10413.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10413.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0523.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10465.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10465.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0633.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10049.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10049.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0219.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10452.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10452.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0189.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10087.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10087.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0591.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10406.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10406.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0458.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10215.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10215.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0510.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10473.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10473.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0347.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10296.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10296.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0551.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10433.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10433.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0256.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10196.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10196.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0446.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10356.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10356.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0215.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10421.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10421.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0620.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10355.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10355.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0043.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10071.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10071.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0165.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10273.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10273.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0262.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10446.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10446.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0016.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10477.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10477.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0414.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10023.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10023.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0212.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10261.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10261.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0158.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10313.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10313.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0264.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10376.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10376.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0048.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10309.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10309.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0544.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10244.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10244.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0303.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10258.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10258.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0164.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10303.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10303.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0464.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10392.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10392.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0030.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10256.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10256.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0100.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10371.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10371.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0417.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10059.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10059.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0118.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10323.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10323.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0391.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10163.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10163.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0211.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10029.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10029.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0547.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10220.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10220.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0029.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10380.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10380.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0515.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10036.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10036.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0573.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10126.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10126.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0276.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10080.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10080.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0393.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10194.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10194.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0209.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10489.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10489.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0116.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10032.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10032.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0481.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10249.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10249.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0282.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10278.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10278.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0396.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10031.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10031.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0626.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10015.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10015.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0509.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10043.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10043.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0348.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10382.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10382.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0087.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10316.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10316.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0339.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10054.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10054.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0404.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10368.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10368.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0115.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10285.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10285.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0540.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10084.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10084.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0452.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10169.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10169.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0445.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10390.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10390.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0214.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10009.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10009.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0398.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10089.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10089.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0485.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10102.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10102.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0381.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10340.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10340.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0586.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10193.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10193.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0487.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10086.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10086.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0232.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10319.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10319.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0356.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10229.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10229.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0474.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10456.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10456.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0317.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10401.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10401.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0507.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10315.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10315.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0252.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10409.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10409.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0136.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10281.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10281.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0249.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10248.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10248.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0479.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10322.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10322.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0402.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10404.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10404.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0453.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10297.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10297.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0548.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10325.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10325.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0026.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10149.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10149.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0235.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10365.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10365.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0191.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10146.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10146.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0559.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10494.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10494.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0432.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10453.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10453.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0032.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10085.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10085.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0307.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10372.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10372.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0490.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10205.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10205.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0344.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10091.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10091.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0167.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10234.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10234.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0392.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10363.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10363.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0448.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10333.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10333.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0098.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10312.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10312.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0072.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10150.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10150.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0495.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10140.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10140.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0099.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10044.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10044.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0566.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10343.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10343.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0386.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10257.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10257.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0449.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10475.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10475.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0557.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10305.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10305.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0088.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10122.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10122.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0023.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10075.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10075.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0300.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10448.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10448.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0513.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10260.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10260.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0554.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10412.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10412.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0061.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10429.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10429.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0388.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10121.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10121.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0233.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10474.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10474.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0010.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10037.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10037.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0204.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10337.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10337.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0245.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10420.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10420.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0292.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10213.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10213.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0281.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10020.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10020.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0351.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10076.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10076.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0380.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10051.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10051.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0552.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10166.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10166.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0313.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10011.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10011.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0017.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10097.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10097.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0047.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10391.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10391.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0385.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10132.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10132.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0611.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10422.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10422.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0239.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10012.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10012.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0009.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10485.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10485.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0257.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10155.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10155.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0415.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10411.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10411.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0163.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10287.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10287.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0159.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10283.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10283.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0364.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10389.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10389.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0040.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10352.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10352.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0025.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10497.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10497.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0288.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10210.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10210.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0621.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10443.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10443.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0397.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10478.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10478.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0113.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10387.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10387.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0068.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10209.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10209.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0190.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10006.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10006.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0248.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10067.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10067.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0622.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10093.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10093.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0527.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10428.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10428.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0467.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10129.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10129.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0407.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10349.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10349.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0328.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10198.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10198.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0325.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10136.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10136.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0038.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10226.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10226.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0149.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10267.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10267.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0206.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10201.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10201.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0133.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10008.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10008.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0374.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10187.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10187.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0530.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10081.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10081.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0517.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10369.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10369.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0550.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10471.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10471.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0183.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10068.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10068.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0433.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10425.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10425.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0001.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10233.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10233.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0192.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10302.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10302.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0521.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10253.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10253.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0624.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10034.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10034.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0155.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10402.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10402.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0345.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10270.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10270.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0102.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10491.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10491.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0291.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10364.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10364.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0572.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10259.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10259.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0373.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10195.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10195.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0033.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10290.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10290.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0442.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10123.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10123.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0077.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10216.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10216.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0279.png"
+                },
+                {
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0324.png"
+                },
+                {
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0468.png"
+                },
+                {
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0612.png"
+                },
+                {
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0132.png"
+                },
+                {
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0104.png"
+                },
+                {
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0075.png"
+                },
+                {
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0305.png"
+                },
+                {
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0173.png"
+                },
+                {
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0370.png"
+                },
+                {
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0244.png"
+                },
+                {
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0628.png"
+                },
+                {
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0176.png"
+                },
+                {
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0426.png"
+                },
+                {
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0337.png"
+                },
+                {
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0137.png"
+                },
+                {
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0506.png"
+                },
+                {
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0078.png"
+                },
+                {
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0295.png"
+                },
+                {
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0366.png"
+                },
+                {
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0065.png"
+                },
+                {
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0574.png"
+                },
+                {
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0494.png"
+                },
+                {
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0560.png"
+                },
+                {
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0465.png"
+                },
+                {
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0576.png"
+                },
+                {
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0187.png"
+                },
+                {
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0545.png"
+                },
+                {
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0296.png"
+                },
+                {
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0605.png"
+                },
+                {
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0299.png"
+                },
+                {
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0014.png"
+                },
+                {
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0036.png"
+                },
+                {
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0615.png"
+                },
+                {
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0562.png"
+                },
+                {
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0372.png"
+                },
+                {
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0333.png"
+                },
+                {
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0058.png"
+                },
+                {
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0384.png"
+                },
+                {
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0327.png"
+                },
+                {
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0466.png"
+                },
+                {
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0314.png"
+                },
+                {
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0375.png"
+                },
+                {
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0298.png"
+                },
+                {
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0362.png"
+                },
+                {
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0220.png"
+                },
+                {
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0382.png"
+                },
+                {
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0579.png"
+                },
+                {
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0435.png"
+                },
+                {
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0227.png"
+                },
+                {
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0439.png"
+                },
+                {
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0022.png"
+                },
+                {
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0577.png"
+                },
+                {
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0006.png"
+                },
+                {
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0558.png"
+                },
+                {
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0162.png"
+                },
+                {
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0143.png"
+                },
+                {
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0243.png"
+                },
+                {
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0224.png"
+                },
+                {
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0251.png"
+                },
+                {
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0041.png"
+                },
+                {
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0178.png"
+                },
+                {
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0535.png"
+                },
+                {
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0105.png"
+                },
+                {
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0240.png"
+                },
+                {
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0210.png"
+                },
+                {
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0543.png"
+                },
+                {
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0411.png"
+                },
+                {
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0488.png"
+                },
+                {
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0619.png"
+                },
+                {
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0049.png"
+                },
+                {
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0546.png"
+                },
+                {
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0352.png"
+                },
+                {
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0518.png"
+                },
+                {
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0634.png"
+                },
+                {
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0454.png"
+                },
+                {
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0492.png"
+                },
+                {
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0334.png"
+                },
+                {
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0399.png"
+                },
+                {
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0274.png"
+                },
+                {
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0311.png"
+                },
+                {
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0526.png"
+                },
+                {
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0473.png"
+                },
+                {
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0079.png"
+                },
+                {
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0179.png"
+                },
+                {
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0134.png"
+                },
+                {
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0138.png"
+                },
+                {
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0436.png"
+                },
+                {
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0427.png"
+                },
+                {
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0004.png"
+                },
+                {
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0578.png"
+                },
+                {
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0480.png"
+                },
+                {
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0338.png"
+                },
+                {
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0497.png"
+                },
+                {
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0608.png"
+                },
+                {
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0067.png"
+                },
+                {
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0094.png"
+                },
+                {
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0434.png"
+                },
+                {
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0607.png"
+                },
+                {
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0188.png"
+                },
+                {
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0637.png"
+                },
+                {
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0107.png"
+                },
+                {
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0084.png"
+                },
+                {
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0182.png"
+                },
+                {
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0422.png"
+                },
+                {
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0350.png"
+                },
+                {
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0486.png"
+                },
+                {
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0416.png"
+                },
+                {
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0265.png"
+                },
+                {
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0258.png"
+                },
+                {
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0035.png"
+                },
+                {
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0112.png"
+                },
+                {
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0536.png"
                 }
             ]
         },
@@ -1788,415 +1665,400 @@
                     "target": "both"
                 }
             ],
+            "dataset_type": "UnlabeledDataset",
             "picture_type": {
                 "image": "L",
                 "label": "L"
             },
             "dataloader_args": {
-                "batch_size": 4,
+                "batch_size": 8,
                 "shuffle": false,
                 "num_workers": 2
             },
             "data": [
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10052.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10052.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0089.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10200.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10200.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0627.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10038.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10038.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0568.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10299.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10299.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0321.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10441.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10441.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0588.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10405.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10405.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0309.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10432.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10432.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0358.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10254.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10254.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0533.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10377.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10377.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0037.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10286.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10286.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0146.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10396.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10396.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0301.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10386.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10386.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0597.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10307.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10307.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0015.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10462.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10462.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0570.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10197.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10197.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0196.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10217.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10217.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0532.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10374.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10374.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0093.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10033.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10033.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0308.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10320.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10320.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0365.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10003.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10003.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0095.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10496.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10496.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0471.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10282.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10282.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0216.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10344.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10344.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0312.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10090.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10090.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0277.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10251.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10251.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0420.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10250.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10250.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0306.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10492.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10492.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0161.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10403.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10403.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0389.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10460.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10460.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0237.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10147.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10147.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0484.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10332.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10332.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0598.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10074.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10074.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0357.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10500.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10500.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0482.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10321.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10321.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0322.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10415.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10415.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0451.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10172.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10172.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0421.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10072.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10072.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0253.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10130.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10130.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0154.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10361.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10361.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0319.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10334.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10334.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0401.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10354.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10354.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0563.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10001.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10001.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0266.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10435.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10435.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0483.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10224.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10224.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0111.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10070.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10070.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0423.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10375.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10375.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0207.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10463.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10463.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0145.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10399.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10399.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0592.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10108.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10108.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0361.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10240.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10240.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0027.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10144.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10144.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0139.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10002.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10002.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0021.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10277.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10277.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0129.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10488.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10488.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0186.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10247.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10247.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0286.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10028.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10028.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0593.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10246.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10246.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0071.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10342.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10342.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0066.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10410.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10410.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0193.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10124.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10124.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0052.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10176.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10176.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0463.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10099.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10099.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0571.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10013.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10013.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0123.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10427.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10427.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0502.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10469.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10469.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0044.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10128.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10128.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0618.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10056.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10056.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0581.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10291.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10291.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0395.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10484.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10484.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0508.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10381.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10381.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0103.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10482.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10482.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0349.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10114.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10114.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0409.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10430.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10430.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0406.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10436.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10436.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0151.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10306.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10306.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0055.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10053.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10053.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0002.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10395.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10395.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0294.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10269.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10269.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0514.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10112.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10112.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0493.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10235.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10235.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0505.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10225.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10225.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0236.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10199.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10199.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0326.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10487.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10487.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0584.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10060.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10060.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0057.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10242.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10242.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0297.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10134.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10134.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0335.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10357.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10357.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0269.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10236.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10236.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0599.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10100.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10100.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0013.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10470.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10470.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0270.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10078.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10078.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0424.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10069.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10069.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0267.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10182.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10182.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0157.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10350.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10350.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0604.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10398.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10398.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0117.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10308.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10308.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0511.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10266.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10266.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0069.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10438.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10438.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0613.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10311.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10311.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0042.png"
                 },
                 {
-                    "image": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\images\\10139.bmp",
-                    "label": "D:\\\\C_File\\\\WDdata\\\\OCTA2D\\labels\\10139.bmp"
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0225.png"
+                },
+                {
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0141.png"
+                },
+                {
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0475.png"
+                },
+                {
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0284.png"
+                },
+                {
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0070.png"
+                },
+                {
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0275.png"
+                },
+                {
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0520.png"
+                },
+                {
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0073.png"
+                },
+                {
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0199.png"
+                },
+                {
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0430.png"
+                },
+                {
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0285.png"
+                },
+                {
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0096.png"
+                },
+                {
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0330.png"
+                },
+                {
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0565.png"
+                },
+                {
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0616.png"
+                },
+                {
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0614.png"
+                },
+                {
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0512.png"
+                },
+                {
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0174.png"
+                },
+                {
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0635.png"
+                },
+                {
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0046.png"
+                },
+                {
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0097.png"
+                },
+                {
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0124.png"
+                },
+                {
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0242.png"
+                },
+                {
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0053.png"
+                },
+                {
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0090.png"
+                },
+                {
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0310.png"
+                },
+                {
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0170.png"
+                },
+                {
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0367.png"
+                },
+                {
+                    "image": "D:\\WangDao\\3DPreprocessCode\\Processed_data\\OCTA10010\\Pictures\\slice_0106.png"
                 }
             ]
         },
@@ -2237,12 +2099,12 @@
         }
     },
     "statistics": {
-        "train_data_size": 1600,
-        "val_data_size": 100,
+        "train_data_size": 512,
+        "val_data_size": 128,
         "test_data_size": 0,
-        "train_dataloader_size": 100,
-        "val_dataloader_size": 25,
+        "train_dataloader_size": 64,
+        "val_dataloader_size": 16,
         "test_dataloader_size": 0,
-        "Creat_time": "2025-11-05 19:08:20"
+        "Creat_time": "2025-11-18 15:47:44"
     }
 }
