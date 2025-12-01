@@ -4,56 +4,62 @@ import torch.nn as nn
 import torch.nn.functional as F
 
 class ConfidenceThresholdLoss(nn.Module):
-    def __init__(self,
-                 low_th: float = 0.3,
-                 high_th: float = 0.7,
-                 reduction: str = "mean",
-                 sigmoid: bool = True):
-        """
-        基于置信度阈值的伪标签损失函数
-        y_true 会被接收但不使用。
+    """
+    使用二维投影标签监督单张二维切片的弱监督损失。
+    结合：
+      1. 投影负样本强监督（T_proj = 0 → y_pred 应为 0）
+      2. 投影正样本区域的“伪标签 + 置信度”监督
+      3. 投影正区域的软一致性约束（避免网络全部预测0）
+    """
 
-        参数:
-            low_th (float): 低置信度阈值 (< low_th → 伪标签=0)
-            high_th (float): 高置信度阈值 (> high_th → 伪标签=1)
-            reduction (str): 归约方式，仅支持 mean 或 sum
-            apply_sigmoid (bool): 是否对 y_pred 先做 sigmoid
-        """
+    def __init__(self,
+                 low_th: float = 0.25,
+                 high_th: float = 0.75,
+                 w_proj_neg: float = 1.0,    # 投影负样本监督权重
+                 w_pseudo: float = 1.0,      # 伪标签监督权重
+                 sigmoid: bool = True):
         super().__init__()
         self.low_th = low_th
         self.high_th = high_th
-        self.reduction = reduction
+        self.w_proj_neg = w_proj_neg
+        self.w_pseudo = w_pseudo
         self.apply_sigmoid = sigmoid
 
-    def forward(self, y_pred: torch.Tensor, y_true: torch.Tensor) -> torch.Tensor:
+    def forward(self, y_pred, proj_label):
         """
-        参数:
-            y_pred: 模型输出 (未 sigmoid 或 已 sigmoid)
-            y_true: 输入的标签，但在本方法中不会使用
+        y_pred: (H, W) — 当前二维切片预测
+        proj_label: (H, W) — 二维投影标签
         """
         if self.apply_sigmoid:
             y_pred_sig = torch.sigmoid(y_pred)
         else:
             y_pred_sig = y_pred
 
-        # -------- 1. 构造 mask：只使用高置信和低置信区域 --------
-        mask_high = (y_pred_sig > self.high_th).float()
-        mask_low = (y_pred_sig < self.low_th).float()
-        mask = mask_high + mask_low  # 1: 参与训练, 0: 不参与
+        # -------- A. 投影=0 区域为可靠负样本 --------
+        # MIP=0 → 切片必定无前景
+        mask_proj_neg = (proj_label < 0.5).float()
 
-        # -------- 2. 构造伪标签 --------
-        pseudo_label = (y_pred_sig > self.high_th).float()
-
-        # -------- 3. 逐像素 BCE 损失 --------
-        loss_pixel = F.binary_cross_entropy(
-            y_pred_sig, pseudo_label, reduction="none"
+        loss_proj_neg = (
+            F.binary_cross_entropy(y_pred_sig, torch.zeros_like(y_pred_sig), reduction="none")
+            * mask_proj_neg
         )
 
-        # -------- 4. 只对 mask 中参与训练的像素计算 loss --------
-        if mask.sum() == 0:
-            # 没有任何像素满足阈值 → 返回 0 防止 NAN
-            return torch.tensor(0.0, device=y_pred.device)
+        # -------- B. 在投影=1 的区域使用置信度伪标签 --------
+        mask_high = (y_pred_sig > self.high_th).float()
+        mask_low = (y_pred_sig < self.low_th).float()
+        mask_conf = (mask_high + mask_low) * (1 - mask_proj_neg)
 
-        loss = (loss_pixel * mask).sum() / (mask.sum() + 1e-6)
+        pseudo_label = mask_high  # 高→1，低→0
 
-        return loss
+        loss_pseudo = (
+            F.binary_cross_entropy(y_pred_sig, pseudo_label, reduction="none")
+            * mask_conf
+        )
+
+        # -------- D. 融合损失 --------
+        total_loss = (
+            self.w_proj_neg * loss_proj_neg.mean()
+            + self.w_pseudo * loss_pseudo.mean()
+        )
+
+        return total_loss

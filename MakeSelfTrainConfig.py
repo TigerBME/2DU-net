@@ -13,6 +13,24 @@ config = get_defult_config()
 # 加入预训练模型参数地址
 config['model']['pre_trained_model'] = r"/root/WangDao/Records/record13/best_model.pth"
 
+self_train_loss =   {
+        "name": "CombinedLoss",
+        "loss": [
+                    {
+                    "name": "ConfidenceThresholdLoss",
+                    "weight": 1.0,
+                    "args": {
+                                "low_th": 0.25,
+                                "high_th": 0.7,
+                                "w_proj_neg": 1.0,
+                                "w_pseudo": 1.0,
+                                "sigmoid": True,
+                            }
+                    }
+                ]
+                    }
+
+config['loss'] = self_train_loss
 
 target_size = (400, 400)
 imagetype = 'L'
@@ -33,6 +51,22 @@ train_data_enhance = [
         "target": "image"
     },
     {
+        "type": "RandomFlip",
+        "params": {
+            "p": 0.5,
+            "direction": "horizontal"
+        },
+        "target": "both"
+    },
+    {
+        "type": "RandomFlip",
+        "params": {
+            "p": 0.5,
+            "direction": "vertical"
+        },
+        "target": "both"
+    },
+    {
         "type": "ToTensor",
         "target": "both"
     }
@@ -40,8 +74,8 @@ train_data_enhance = [
 
 dataconfig = {
     "train": {
-        "Use_dataenhance": False,        # 训练集禁用数据增强
-        "data_per_picture": 1,          # 每张图片生成的训练样本数
+        "Use_dataenhance": True,        # 训练集禁用数据增强
+        "data_per_picture": 5,          # 每张图片生成的训练样本数
         'preprocess': train_data_enhance,
         'dataset_type': "UnlabeledDataset",
         'picture_type': {
@@ -102,6 +136,7 @@ if device == "cuda":
     data_path = r"/root/WangDao/Data"
 else:
     data_path = r"D:\WangDao\3DPreprocessCode\Processed_data\OCTA10010\Pictures"
+    label_path = r"D:\WangDao\2DTrainCode\10010.bmp"
 
 image_dirs = [data_path]
 
@@ -116,13 +151,15 @@ random.shuffle(combined_files)
 image_files = combined_files
 
 # 划分训练集和验证集（8:2）
-split_idx = int(len(image_files) * 0.8)
+# 训练集80%，验证集20%
+# 标签统一使用二维投影标签
+split_idx = int(len(image_files) * 0.9)
 dataconfig['train']['data'] = [
-    {'image': img} 
+    {'image': img, 'label': label_path} 
     for img in image_files[:split_idx]
 ]
 dataconfig['val']['data'] = [
-    {'image': img} 
+    {'image': img, 'label': label_path} 
     for img in image_files[split_idx:]
 ]
 dataconfig['test']['data'] = []

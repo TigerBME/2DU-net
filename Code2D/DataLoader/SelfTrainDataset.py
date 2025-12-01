@@ -37,17 +37,22 @@ class UnlabeledDataset(Dataset):
 
         image_path = item['image']
 
+
         # -------- 1. 加载图像 --------
         image = Image.open(image_path).convert(self.imagetype)
 
-        # -------- 2. 生成一个全黑标签（保持尺寸一致） --------
-        # 注意：label 不从文件读取，完全现场生成
-        label = Image.new(self.labeltype, image.size)  # 全黑图
+        # -------- 2. 加载标签标签（尺寸一致） --------
+        # 如果有标签，加载之
+        if 'label' in item:
+            label_path = item['label']
+            label = Image.open(label_path).convert(self.labeltype)
+        else:
+            # 如果没有标签，生成全黑标签
+            label = Image.new(self.labeltype, image.size, 0)
 
         # -------- 3. 应用与原版完全相同的 transform 规则 --------
         if self.data_transforms is not None:
             for transform, target in zip(self.data_transforms, self.transform_targets):
-
                 if target == 'image':
                     image = transform(image)
                 elif target == 'label':

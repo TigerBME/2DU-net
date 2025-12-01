@@ -5,10 +5,11 @@
 import json
 import os
 from Code2D.ConfigTool import getpath
+from torch.cuda import is_available as cuda_available
 import glob
 
 # ------------------- 读取训练配置 -------------------
-record_folder_path = r"D:\WangDao\2DTrainCode\Records\record24"
+record_folder_path = r"D:\WangDao\2DTrainCode\Records\record29"
 
 model_path = os.path.join(record_folder_path, "best_model.pth")
 config_path = os.path.join(record_folder_path, "config.json")
@@ -21,7 +22,10 @@ with open(config_path, 'r', encoding='utf-8') as f:
 
 # ------------------- 测试数据配置 -------------------
 # 测试数据配置时只允许修改config['data']['test']['data']字段(即测试数据路径)
-input_path = r"D:\WangDao\3DPreprocessCode\Processed_data\OCTA10010\Pictures"
+if cuda_available():
+    input_path = r"/root/WangDao/Data/Pictures"
+else:
+    input_path = r"D:\WangDao\3DPreprocessCode\Processed_data\OCTA10270\Pictures"
 
 file_path = os.path.dirname(os.path.abspath(__file__))
 output_path = os.path.join(file_path, getpath("OUTPUTS","predict"))

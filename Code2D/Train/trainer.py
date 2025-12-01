@@ -156,7 +156,7 @@ def _validate_model(model, loader, criterion, device, train_kind: str='train'):
             
             # 计算指标
             if train_kind == 'selftrain':
-                batch_metrics = _calculate_unsupervised_metrics(outputs)    
+                batch_metrics = _calculate_unsupervised_metrics(outputs, targets)    
             else:
                 batch_metrics = _calculate_metrics(outputs, targets)
 
@@ -195,32 +195,43 @@ def _calculate_metrics(pred, target, threshold=0.5):
         'accuracy': accuracy.item()
     }
 
-def _calculate_unsupervised_metrics(pred):
+def _calculate_unsupervised_metrics(pred, label):
     """
-    计算无监督评估指标：
-    1. 平均置信度（mean confidence）
-    2. 平均预测熵（mean entropy）
-    
-    pred: raw logits (模型输出，未经过 sigmoid)
+    pred: raw logits (B,1,H,W)
+    label: weak label (B,1,H,W), projection label
+           label = 0      → 强监督区域
+           label = 1/其它 → 非强监督区域
     """
-    # 概率
     prob = torch.sigmoid(pred)
 
-    # ---------- 1. 平均置信度 ----------
-    # 对于每个像素，置信度 = max(p, 1-p)
+    # ---------------------
+    # 1. mean confidence
+    # ---------------------
     confidence = torch.max(prob, 1 - prob)
     mean_confidence = confidence.mean()
 
-    # ---------- 2. 平均预测熵 ----------
-    # H = - p log(p) - (1-p) log(1-p)
+    # ---------------------
+    # 2. mean entropy
+    # ---------------------
     eps = 1e-8
-    entropy = -(prob * torch.log(prob + eps) + (1 - prob) * torch.log(1 - prob + eps))
+    entropy = -(prob * torch.log(prob + eps) +
+                (1 - prob) * torch.log(1 - prob + eps))
     mean_entropy = entropy.mean()
 
+    # ------------------------------------------------------
+    # 3. 修改后的 Dice 计算：使用 label != 0 区域 prob 的平均值
+    # ------------------------------------------------------
+    mask = (label != 0).float()   # 你要求使用非0区域
+    if mask.sum() == 0:
+        dice_val = 0.0
+    else:
+        # 直接对 mask 内所有 prob 求平均
+        dice_val = (prob * mask).sum() / (mask.sum() + 1e-6)
+
     return {
-        'dice':  -mean_entropy.item(),
+        'dice': dice_val.item(),                 # 用于 early stopping（越大越好）
         'mean_confidence': mean_confidence.item(),
-        'mean_entropy': mean_entropy.item()
+        'mean_entropy': mean_entropy.item(),
     }
 
 def _warmup_lr(optimizer, base_lr, epoch, total):

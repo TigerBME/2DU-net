@@ -1,5 +1,15 @@
-*.txt
-*.gitignore
+# 忽略临时文件与缓存
 *.pyc
+__pycache__/
+
+# 忽略图片
+*.png
+*.jpg
+*.bmp
+
+# 忽略 txt 文件
+*.txt
+
+# 忽略输出结果与日志
 /Records/
 /OUTPUTS/
