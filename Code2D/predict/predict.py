@@ -4,8 +4,11 @@ import os
 from PIL import Image
 import torchvision.transforms as transforms
 
-def predict_model(model: torch.nn.Module, test_loader: torch.utils.data.DataLoader, device: torch.device, 
-                  output_dir: str, threshold: float = 0.5) -> str:
+def predict_model(model: torch.nn.Module, 
+                  test_loader: torch.utils.data.DataLoader, 
+                  device: torch.device, 
+                  output_dir: str, 
+                  threshold: float = 0.5) -> str:
     """执行模型预测并保存结果为BMP图像"""
     model.eval()
     

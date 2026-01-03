@@ -4,12 +4,16 @@ import time
 from tqdm import tqdm
 from Stopping import EarlyStopper
 from torch.utils.data import DataLoader
+from Log import TrainingLogger
 
 def train_model(train_config: dict, model: torch.nn.Module, 
                 train_loader: DataLoader, val_loader: DataLoader, 
-                criterion: torch.nn.modules.loss, optimizer: torch.optim.Optimizer, scheduler: torch.optim.lr_scheduler,
-                earlystopper: EarlyStopper, logger,
-                device: torch.device):
+                criterion: torch.nn.modules.loss, optimizer: torch.optim.Optimizer, 
+                scheduler: torch.optim.lr_scheduler,
+                earlystopper: EarlyStopper, 
+                logger: TrainingLogger,
+                device: torch.device,
+                ):
     """
     核心训练模块
     Args:
@@ -55,6 +59,11 @@ def train_model(train_config: dict, model: torch.nn.Module,
         val_metrics = _validate_model(
             model, val_loader, criterion, device, train_kind=train_kind
         )
+
+        # 确保返回 验证集损失 和 监控指标 
+        assert 'monitor_metrics' in val_metrics \
+                 and 'loss' in val_metrics ,\
+                 "Missing key 'loss' or'monitor_metrics' in validation metrics"
         
         # 记录指标
         epoch_time = time.time() - epoch_start
@@ -68,16 +77,26 @@ def train_model(train_config: dict, model: torch.nn.Module,
         }
         logger.log_metrics(log_data)
     
+        print(f"monitored metric = {val_metrics['monitor_metrics']}")
         if train_kind != 'selftrain':
             print(f"Dice = {val_metrics['metrics']['dice']}")
 
         # 检查早停和学习率调整
-        early_stop_return_config =  earlystopper.check_early_stop(val_metrics['metrics']['dice'], model)
+        early_stop_return_config =  earlystopper.check_early_stop(\
+            val_metrics['metrics']['dice'], model)
         # print(f"Score is {early_stop_return_config.pop('best_score')}")
-        print(f"the train will early stop in {early_stop_return_config.pop('patience_left')} epochs")
+        print(f"the train will early stop in \
+              {early_stop_return_config.pop('patience_left')} epochs")
+        
         print(f"the progress is {early_stop_return_config.pop('progress')}")
 
-        if early_stop_return_config.pop('early_stop', False):
+        # 如果有新最佳分数，记录日志
+        if early_stop_return_config.pop('best_epoch', 0) == epoch+1:
+            print(f"new best score found at epoch {epoch+1}")
+            logger.log_message(f"new best score found at epoch {epoch+1} with score {val_metrics['monitor_metrics']}")
+
+        # 如果早停，则停止训练
+        if early_stop_return_config.pop('early_stop', False) == True:
             print(f"early stop triggered, training stopped at epoch {epoch+1}")
             break    
 
@@ -90,7 +109,6 @@ def train_model(train_config: dict, model: torch.nn.Module,
             else:
                 # 其他调度器只需简单调用 step()
                 scheduler.step()
-
 
 def _train_epoch(model, 
                  loader, 
@@ -130,7 +148,7 @@ def _train_epoch(model,
     
     return total_loss/len(loader), current_lr
 
-def _validate_model(model, loader, criterion, device, train_kind: str='train'):
+def _validate_model(model, loader, criterion, device, train_kind: str='train')->dict:
     """执行模型验证"""
 
     frontlength = 25
@@ -138,11 +156,9 @@ def _validate_model(model, loader, criterion, device, train_kind: str='train'):
 
     model.eval()
     total_loss = 0
-    if train_kind == 'selftrain':
-        metrics = {'dice': 0, 'mean_confidence': 0,'mean_entropy': 0}
-    else:
-        metrics = {'dice': 0, 'sensitivity': 0, 'specificity': 0, 'accuracy': 0}
-    
+
+    metrics = dict()
+
     with torch.no_grad():
         description = "Validating"
         progress_bar = tqdm(loader, desc=description + (frontlength-len(description))*" ")
@@ -160,20 +176,24 @@ def _validate_model(model, loader, criterion, device, train_kind: str='train'):
             else:
                 batch_metrics = _calculate_metrics(outputs, targets)
 
-            for k in metrics:
+            for k in batch_metrics:
                 metrics[k] += batch_metrics[k] * inputs.size(0)
+
+
 
             postfix_str = f""
             progress_bar.set_postfix_str(postfix_str + (backlength-len(postfix_str))*" ")
     
     # 计算平均指标
     num_samples = len(loader.dataset)
+
     return {
         'loss': total_loss/len(loader),
-        'metrics': {k: metrics[k]/num_samples for k in metrics}
+        'metrics': {k: metrics[k]/num_samples for k in metrics},
+        'monitor_metrics': metrics['dice']/num_samples
     }
 
-def _calculate_metrics(pred, target, threshold=0.5):
+def _calculate_metrics(pred, target, threshold=0.5)->dict:
     """计算评估指标"""
     pred = (torch.sigmoid(pred) > threshold).float()
     target = (target > threshold).float()
@@ -192,7 +212,8 @@ def _calculate_metrics(pred, target, threshold=0.5):
         'dice': dice.item(),
         'sensitivity': sensitivity.item(),
         'specificity': specificity.item(),
-        'accuracy': accuracy.item()
+        'accuracy': accuracy.item(),
+        'monitor_metrics': dice.item(),
     }
 
 def _calculate_unsupervised_metrics(pred, label):

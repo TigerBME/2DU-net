@@ -1,3 +1,5 @@
+import os
+import shutil
 from predict import predict_model
 import json
 import argparse
@@ -42,6 +44,12 @@ def main(config_path):
         output_dir=test_config['output_dir'],
         threshold=test_config.get('threshold', 0.5)
     )
+
+    # 保存预测配置文件到输出目录
+    aim_cfg_path = os.path.join(test_config['output_dir'],'predict_config.json')
+    shutil.copy(config_path, aim_cfg_path)
+
+    # 模型推理结束
     print(f"Predict done, results saved to {test_config['output_dir']}")
 
 if __name__ == "__main__":

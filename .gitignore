@@ -13,3 +13,6 @@ __pycache__/
 # 忽略输出结果与日志
 /Records/
 /OUTPUTS/
+
+# 忽略测试文件
+test.py

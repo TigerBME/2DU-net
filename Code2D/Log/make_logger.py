@@ -16,7 +16,7 @@ def make_logger(log_config: dict):
     metrics = log_config.pop('metrics_to_log')
     metrics_to_log = []
     for metric in metrics:
-        if metrics[metric]:
+        if metrics[metric] == True:
             metrics_to_log.append(metric)
     log_config['csv_columns'] = metrics_to_log
 

@@ -40,7 +40,6 @@ def main(config_path):
     val_config = data_config.pop('val')
     train_loader = get_dataloader(train_config, mode='train')
     val_loader = get_dataloader(val_config, mode='val')
-    
     print(f"Training data: {len(train_loader.dataset)} samples")
     print(f"Validation data: {len(val_loader.dataset)} samples")
     
@@ -75,6 +74,7 @@ def main(config_path):
     print(f"Early stopping: {early_stopper.__class__.__name__}")
     
     # 记录实验开始
+    # 并将本次训练的配置文件复制到日志
     logger.start_experiment(cfg_path=config_path)
     
     # 执行训练
