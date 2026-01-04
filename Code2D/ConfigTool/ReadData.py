@@ -47,7 +47,7 @@ def nifti_to_bmp(nifti_file_path: str, bmp_file_folder: str, cutting_dimension: 
 
             # 创建图像并保存
             img = Image.fromarray(slice_data)
-            img_path = os.path.join(bmp_file_folder, f'slice_{slice_index:4d}.bmp')
+            img_path = os.path.join(bmp_file_folder, f'slice_{slice_index:04d}.bmp')
             img.save(img_path)
 
             bmp_paths.append(img_path)
@@ -101,7 +101,7 @@ def nifti_to_png(nifti_file_path: str, png_file_folder: str, cutting_dimension: 
 
             # 创建图像并保存
             img = Image.fromarray(slice_data)
-            img_path = os.path.join(png_file_folder, f'slice_{slice_index:4d}.png')
+            img_path = os.path.join(png_file_folder, f'slice_{slice_index:04d}.png')
             img.save(img_path)
 
             png_paths.append(img_path)
