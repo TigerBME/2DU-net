@@ -8,6 +8,8 @@ from torch.cuda import is_available as cuda_available
 from torch import device as torch_device
 from DataLoader import get_dataloader
 from Model import create_model
+from Postprocess import get_postprocess_function
+
 
 def load_config(config_path):
     """加载配置文件"""
@@ -21,6 +23,9 @@ def main(config_path):
     data_config = config.pop('data')
     test_data_config = data_config.pop('test')
     test_config = config.pop('test')
+
+    postprocess_config = test_config.get('binarization')
+    postprocess = get_postprocess_function(postprocess_config)
 
     # 创建模型并加载权重
     try:
@@ -42,7 +47,7 @@ def main(config_path):
         test_loader=test_loader,
         device=device,
         output_dir=test_config['output_dir'],
-        threshold=test_config.get('threshold', 0.5)
+        postprocess = postprocess
     )
 
     # 保存预测配置文件到输出目录

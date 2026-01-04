@@ -8,7 +8,8 @@ def predict_model(model: torch.nn.Module,
                   test_loader: torch.utils.data.DataLoader, 
                   device: torch.device, 
                   output_dir: str, 
-                  threshold: float = 0.5) -> str:
+                  postprocess: callable = None,
+                  ) -> str:
     """执行模型预测并保存结果为BMP图像"""
     model.eval()
     
@@ -23,8 +24,9 @@ def predict_model(model: torch.nn.Module,
             outputs = model(inputs)
             preds = torch.sigmoid(outputs).cpu()
             
-            # 二值化并转换为0-255的uint8格式
-            preds = (preds > threshold).float() * 255  # [0 or 255]
+            # 使用指定方法二值化并转换为0-255的uint8格式
+            preds = postprocess(preds) 
+
             preds = preds.byte()  # 移除批次维度并转为uint8
             
             # 处理每个预测结果

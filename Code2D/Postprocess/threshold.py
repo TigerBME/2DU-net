@@ -1,3 +1,4 @@
+import sys
 import numpy as np
 from skimage.filters import apply_hysteresis_threshold
 
@@ -45,3 +46,39 @@ class HysteresisThreshold:
             high=self.high_threshold
         )
         return binary_mask.astype(np.uint8)
+
+def get_postprocess_function(config: dict):
+    """
+    根据配置字典获取后处理函数实例。
+
+    配置格式示例：
+    - 单阈值二值化：
+        {
+            "name": "SingleThreshold",
+            "threshold": 0.5
+        }
+    - 双阈值滞后二值化：
+        {
+            "name": "HysteresisThreshold",
+            "low_threshold": 0.3,
+            "high_threshold": 0.7
+        }   
+    """
+    name = config.pop("name")
+    try:
+        # 尝试获取类
+        PostprocessClass = getattr(sys.modules[__name__], name)
+        
+        # 尝试创建实例
+        try:
+            postprocess = PostprocessClass(**config)
+        except Exception as e:
+            raise ValueError(f"Failed to instantiate {name} with config {config}: {str(e)}")
+            
+    except AttributeError as e:
+        raise ValueError(f"Postprocess class '{name}' not found in module '{__name__}'. \
+                         Available classes: {[cls for cls in dir(sys.modules[__name__]) if not cls.startswith('_')]}")
+
+    return postprocess
+
+

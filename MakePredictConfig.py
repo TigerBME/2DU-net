@@ -55,6 +55,10 @@ config['data']['test']['data'] = [
 test_config = {
     "model_path":model_path,
     "output_dir":output_path,
+    "binarization":{
+        "name": "SingleThreshold",
+        "threshold": 0.5
+    }
 }
 
 config['test'] = test_config
