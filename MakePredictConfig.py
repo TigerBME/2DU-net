@@ -5,6 +5,7 @@
 import json
 import os
 from Code2D.ConfigTool import getpath
+from Code2D.ConfigTool.ReadData import nifti_to_png
 from torch.cuda import is_available as cuda_available
 import glob
 
@@ -22,20 +23,25 @@ with open(config_path, 'r', encoding='utf-8') as f:
 
 # ------------------- 测试数据配置 -------------------
 # 测试数据配置时只允许修改config['data']['test']['data']字段(即测试数据路径)
-if cuda_available():
-    input_path = r"/root/WangDao/Data/Pictures"
-else:
-    input_path = r"D:\WangDao\3DPreprocessCode\Processed_data\OCTA10270\Pictures"
+# if cuda_available():
+#     input_path = r"/root/WangDao/Data/Pictures"
+# else:
+#     input_path = r"D:\WangDao\3DPreprocessCode\Processed_data\OCTA10270\Pictures"
+
+# 输入的nifty文件路径
+input_nifty_path = r"D:\WangDao\3DPreprocessCode\raw_data_nifty\10025\10025_nifty.nii.gz"
+tempdir = getpath("Code2D","Temp") # 临时存放png文件的路径
+input_files = nifti_to_png(input_nifty_path, tempdir, cutting_dimension=1) # 生成png文件并获取png文件路径列表
 
 file_path = os.path.dirname(os.path.abspath(__file__))
-output_path = os.path.join(file_path, getpath("OUTPUTS","predict"))
-
-os.makedirs(output_path, exist_ok=True)
+output_path = os.path.join(file_path, getpath("OUTPUTS","predict")) # 输出文件夹（也可另外指定）
+os.makedirs(output_path, exist_ok=True) # 创建输出文件夹
 
 input_type = "png" # 指定输入的图像数据类型
 
 # 测试数据输入
-input_files = glob.glob(os.path.join(input_path,f"*.{input_type}"))
+# input_files = glob.glob(os.path.join(input_path,f"*.{input_type}"))
+
 config['data']['test']['data'] = [
     {
         "image": file, 
