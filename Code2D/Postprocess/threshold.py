@@ -20,6 +20,15 @@ class HysteresisThreshold:
         # 转回 Tensor 并转 0/255
         return torch.from_numpy(mask_np.astype(np.uint8)) * 255
 
+class Remain_probability_process:
+    def __call__(self, prob_map: torch.Tensor) -> torch.Tensor:
+        '''
+        ->[0-255]
+        '''
+        weight = prob_map.max()-prob_map.min()
+        prob_map = (prob_map - prob_map.min()) / weight * 255.0
+        return prob_map.to(torch.uint8)
+
 def get_postprocess_function(config: dict):
     """
     根据配置字典获取后处理函数实例。
