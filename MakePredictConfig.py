@@ -10,7 +10,7 @@ from torch.cuda import is_available as cuda_available
 import glob
 
 # ------------------- 读取训练配置 -------------------
-record_folder_path = r"D:\WangDao\2DTrainCode\Records\record29"
+record_folder_path = r"/root/WangDao/Record/record13"
 
 model_path = os.path.join(record_folder_path, "best_model.pth")
 config_path = os.path.join(record_folder_path, "config.json")
@@ -29,13 +29,14 @@ with open(config_path, 'r', encoding='utf-8') as f:
 #     input_path = r"D:\WangDao\3DPreprocessCode\Processed_data\OCTA10270\Pictures"
 
 # 输入的nifty文件路径
-input_nifty_path = r"D:\WangDao\3DPreprocessCode\raw_data_nifty\10025\10025_nifty.nii.gz"
+input_nifty_path = r"/root/WangDao/DATA/10025/Masked_volume.nii.gz"
 tempdir = getpath("Code2D","Temp") # 临时存放png文件的路径
 input_files = nifti_to_png(input_nifty_path, tempdir, cutting_dimension=1) # 生成png文件并获取png文件路径列表
 
 file_path = os.path.dirname(os.path.abspath(__file__))
-output_path = os.path.join(file_path, getpath("OUTPUTS","predict")) # 输出文件夹（也可另外指定）
+output_path = os.path.join(file_path, getpath("PREDICT_OUTPUTS","predict")) # 输出文件夹（也可另外指定）
 os.makedirs(output_path, exist_ok=True) # 创建输出文件夹
+os.makedirs(os.path.join(output_path, "pictures"), exist_ok=True) # 创建存放预测图片的文件夹
 
 input_type = "png" # 指定输入的图像数据类型
 
@@ -45,7 +46,7 @@ input_type = "png" # 指定输入的图像数据类型
 config['data']['test']['data'] = [
     {
         "image": file, 
-        "name": os.path.join(output_path, os.path.basename(file))
+        "name": os.path.join(output_path, "pictures", os.path.basename(file))
     } 
     for file in input_files
 ] # 这里的name字段是预测结果的输出路径,默认与输入文件同名
@@ -56,9 +57,11 @@ test_config = {
     "model_path":model_path,
     "output_dir":output_path,
     "binarization":{
-        "name": "SingleThreshold",
-        "threshold": 0.5
-    }
+        "name": "HysteresisThreshold",
+        "low_threshold": 0.4,
+        "high_threshold": 0.8
+    },
+    "input_nifty": input_nifty_path,
 }
 
 config['test'] = test_config
