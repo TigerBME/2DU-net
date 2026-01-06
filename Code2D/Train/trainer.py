@@ -120,6 +120,7 @@ def _train_epoch(model,
     frontlength = 25
     backlength = 15
 
+    model.train()
     total_loss = 0
     current_lr = optimizer.param_groups[0]['lr']
     accumulated_grad = 0  # 用于记录累积的梯度
@@ -177,9 +178,9 @@ def _validate_model(model, loader, criterion, device, train_kind: str='train')->
                 batch_metrics = _calculate_metrics(outputs, targets)
 
             for k in batch_metrics:
+                if k not in metrics:
+                    metrics[k] = 0.0
                 metrics[k] += batch_metrics[k] * inputs.size(0)
-
-
 
             postfix_str = f""
             progress_bar.set_postfix_str(postfix_str + (backlength-len(postfix_str))*" ")

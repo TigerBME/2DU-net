@@ -3,6 +3,7 @@ import os
 import glob
 from torch.cuda import is_available as cuda_available
 from Code2D.ConfigTool import *
+from Code2D.ConfigTool.ReadData import nifti_to_png
 import random
 from Default_config import get_defult_config
 
@@ -11,7 +12,7 @@ config = get_defult_config()
 # 包含model、loss、optimizer、scheduler、training、logging、early_stopping七个配置项
 
 # 加入预训练模型参数地址
-config['model']['pre_trained_model'] = r"/root/WangDao/Records/record13/best_model.pth"
+config['model']['pre_trained_model'] = r"/root/WangDao/2Dtraincode/record13/best_model.pth"
 
 self_train_loss =   {
         "name": "CombinedLoss",
@@ -131,19 +132,24 @@ device = "cuda" if cuda_available() else "cpu"
 
 # OCTA2D-selftrain
 print("Start making Data...")
+image_files = []
 if device == "cuda":
     # data_path = r"C:\\Users\\Dell\\Desktop\\WDprogram\\OCTA2D"
-    data_path = r"/root/WangDao/Data"
+    data_path = r"/root/WangDao/2Dtraincode/10025/Masked_volume.nii.gz"
+    image_files = nifti_to_png(
+        nifti_file_path=data_path,
+        png_file_folder=getpath('Code2D','Temp'),
+        cutting_dimension=1
+    )
+    label_path = r"/root/WangDao/2Dtraincode/10025/10025.bmp"
 else:
     data_path = r"D:\WangDao\3DPreprocessCode\Processed_data\OCTA10010\Pictures"
     label_path = r"D:\WangDao\2DTrainCode\10010.bmp"
 
-image_dirs = [data_path]
-
+# image_dirs = [data_path]
 # 读取并合并所有图像路径
-image_files = []
-for d in image_dirs:
-    image_files.extend(sorted(glob.glob(os.path.join(d, "*.png"))))
+# for d in image_dirs:
+#     image_files.extend(sorted(glob.glob(os.path.join(d, "*.png"))))
 
 # 打乱文件列表
 combined_files = image_files
@@ -175,4 +181,4 @@ check_config(config)
 configpath = 'config.json'
 with open(configpath, 'w', encoding='utf-8') as f:
     json.dump(config, f, indent=4, ensure_ascii=False)
-print(f"config file saved to: {os.path.abspath(configpath)}")
+print(f"config file saved to:\n{os.path.abspath(configpath)}")
