@@ -21,10 +21,10 @@ self_train_loss =   {
                     "name": "ConfidenceThresholdLoss",
                     "weight": 1.0,
                     "args": {
-                                "low_th": 0.25,
+                                "low_th": 0.1,
                                 "high_th": 0.7,
                                 "w_proj_neg": 1.0,
-                                "w_pseudo": 1.0,
+                                "w_pseudo": 3.0,
                                 "sigmoid": True,
                             }
                     }
