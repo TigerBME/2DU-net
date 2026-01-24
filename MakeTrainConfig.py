@@ -171,11 +171,13 @@ label_dirs = [os.path.join(data_path, "labels"),
 image_files = []
 for d in image_dirs:
     image_files.extend(sorted(glob.glob(os.path.join(d, "*.bmp"))))
+    image_files.extend(sorted(glob.glob(os.path.join(d, "*.png"))))
 
 # 读取并合并所有标签路径
 label_files = []
 for d in label_dirs:
     label_files.extend(sorted(glob.glob(os.path.join(d, "*.bmp"))))
+    label_files.extend(sorted(glob.glob(os.path.join(d, "*.png"))))
 
 '''
 # DRIVE
@@ -219,4 +221,4 @@ check_config(config)
 configpath = 'config.json'
 with open(configpath, 'w', encoding='utf-8') as f:
     json.dump(config, f, indent=4, ensure_ascii=False)
-print(f"config file saved to: {os.path.abspath(configpath)}")
+print(f"config file saved to: \n{os.path.abspath(configpath)}")
