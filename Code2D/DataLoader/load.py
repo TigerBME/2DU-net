@@ -87,9 +87,9 @@ def get_dataloader(data_config:dict, mode:str):
         # label_transforms = build_transforms(data_config['preprocess']['label'])
         
         # 初始化数据集
-        Dataset = getattr(current_module, data_config['dataset_type'])
+        # Dataset = getattr(current_module, data_config['dataset_type'])
 
-        dataset = Dataset(
+        dataset = CustomDataset(
             data_list=data_config['data'],
             data_transform=data_transforms,
             transform_targets=transforms_targets,
