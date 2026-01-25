@@ -6,8 +6,10 @@ import json
 import os
 from Code2D.ConfigTool import getpath
 from Code2D.ConfigTool.ReadData import nifti_to_png
+from Code2D import model_predict
 from torch.cuda import is_available as cuda_available
 import glob
+
 
 # ------------------- 读取训练配置 -------------------
 record_folder_path = r"/root/WangDao/Record/record13"
@@ -73,3 +75,21 @@ predict_config_path = os.path.join(record_folder_path, "predict_config.json")
 with open(predict_config_path, 'w', encoding='utf-8') as f:
     json.dump(config, f, indent=4, ensure_ascii=False)
 print(f"配置文件已生成：\n{os.path.abspath(predict_config_path)}")
+
+# ------------------- 执行预测 -------------------
+PREDICT_NOW = True
+if PREDICT_NOW:
+    model_predict(predict_config_path)
+else:
+    print(f"是否执行预测...")
+    # 询问用户，输入Y执行，N退出，其余重新输入
+    while True:
+        user_input = input("是否执行预测？(Y/N): ").strip().upper()
+        if user_input == 'Y':
+            model_predict(predict_config_path)
+            break
+        elif user_input == 'N':
+            print("退出程序,请手动执行预测代码")
+            break
+        else:
+            print("无效输入，请输入Y或N。")

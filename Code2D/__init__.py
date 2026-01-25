@@ -21,3 +21,9 @@ import Model
 import ConfigTool
 
 
+
+# 导入modeltrain
+# 导入modelpredict
+from ModelTrain import main as model_train
+from ModelPredict import main as model_predict
+

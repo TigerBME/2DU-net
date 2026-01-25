@@ -16,7 +16,12 @@ def load_config(config_path):
     with open(config_path) as f:
         return json.load(f)
 
-def main(config_path):
+def main(config_path: str):
+    '''
+    执行模型预测
+
+    config_path: 配置文件路径
+    '''
     config = load_config(config_path)
     device = torch_device('cuda' if cuda_available() else 'cpu')
 
