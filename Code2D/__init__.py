@@ -27,3 +27,5 @@ import ConfigTool
 from ModelTrain import main as model_train
 from ModelPredict import main as model_predict
 
+# 导入默认配置
+from Config import get_default_config

@@ -1,0 +1,2233 @@
+{
+    "model": {
+        "model_type": "attentionunet",
+        "spatial_dims": 2,
+        "in_channels": 1,
+        "out_channels": 1
+    },
+    "loss": {
+        "name": "CombinedLoss",
+        "loss": [
+            {
+                "name": "DiceLoss",
+                "weight": 0.9,
+                "args": {
+                    "smooth": 1e-05,
+                    "sigmoid": true,
+                    "reduction": "mean"
+                }
+            },
+            {
+                "name": "BCELoss",
+                "weight": 0.1,
+                "args": {
+                    "reduction": "mean",
+                    "pos_weight": 5
+                }
+            }
+        ]
+    },
+    "optimizer": {
+        "name": "AdamW",
+        "lr": 0.001,
+        "betas": [
+            0.9,
+            0.999
+        ],
+        "eps": 1e-08,
+        "weight_decay": 0.0001
+    },
+    "scheduler": {
+        "name": "ReduceLROnPlateau",
+        "mode": "max",
+        "factor": 0.6,
+        "patience": 5,
+        "threshold": 0.001,
+        "cooldown": 1,
+        "threshold_mode": "abs",
+        "min_lr": 1e-06,
+        "eps": 1e-08
+    },
+    "training": {
+        "epochs": 99,
+        "accumulation_steps": 1,
+        "warm_up_epochs": 3
+    },
+    "logging": {
+        "log_dir": "./Records/record13",
+        "metrics_to_log": {
+            "epoch": true,
+            "train_loss": true,
+            "val_loss": true,
+            "dice": true,
+            "lr": true,
+            "time": true,
+            "sensitivity": true,
+            "specificity": true,
+            "accuracy": true
+        },
+        "save_best_only": true,
+        "overwrite": false
+    },
+    "early_stopping": {
+        "patience": 20,
+        "delta": 0.0008,
+        "mode": "max",
+        "model_save_path": "Records/record13/best_model.pth"
+    },
+    "data": {
+        "train": {
+            "Use_dataenhance": true,
+            "data_per_picture": 10,
+            "preprocess": [
+                {
+                    "type": "Resize",
+                    "params": {
+                        "size": [
+                            400,
+                            400
+                        ]
+                    },
+                    "target": "both"
+                },
+                {
+                    "type": "RandomEqualize",
+                    "params": {
+                        "p": 1.0
+                    },
+                    "target": "image"
+                },
+                {
+                    "type": "RandomRotate",
+                    "params": {
+                        "p": 0.6,
+                        "max_angle": 30
+                    },
+                    "target": "both"
+                },
+                {
+                    "type": "RandomFlip",
+                    "params": {
+                        "p": 0.5,
+                        "direction": "horizontal"
+                    },
+                    "target": "both"
+                },
+                {
+                    "type": "RandomFlip",
+                    "params": {
+                        "p": 0.5,
+                        "direction": "vertical"
+                    },
+                    "target": "both"
+                },
+                {
+                    "type": "ToTensor",
+                    "target": "both"
+                },
+                {
+                    "type": "AddGaussianNoise",
+                    "params": {
+                        "p": 0.5,
+                        "mean": 0,
+                        "var": 0.01
+                    },
+                    "target": "image"
+                }
+            ],
+            "picture_type": {
+                "image": "L",
+                "label": "L"
+            },
+            "dataloader_args": {
+                "batch_size": 8,
+                "shuffle": true,
+                "num_workers": 4
+            },
+            "data": [
+                {
+                    "image": "/root/WangDao/Data/images/10428.bmp",
+                    "label": "/root/WangDao/Data/labels/10428.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10025.bmp",
+                    "label": "/root/WangDao/Data/labels/10025.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10250.bmp",
+                    "label": "/root/WangDao/Data/labels/10250.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10321.bmp",
+                    "label": "/root/WangDao/Data/labels/10321.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10271.bmp",
+                    "label": "/root/WangDao/Data/labels/10271.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10485.bmp",
+                    "label": "/root/WangDao/Data/labels/10485.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10453.bmp",
+                    "label": "/root/WangDao/Data/labels/10453.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10361.bmp",
+                    "label": "/root/WangDao/Data/labels/10361.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10383.bmp",
+                    "label": "/root/WangDao/Data/labels/10383.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10341.bmp",
+                    "label": "/root/WangDao/Data/labels/10341.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10452.bmp",
+                    "label": "/root/WangDao/Data/labels/10452.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10134.bmp",
+                    "label": "/root/WangDao/Data/labels/10134.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10333.bmp",
+                    "label": "/root/WangDao/Data/labels/10333.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10102.bmp",
+                    "label": "/root/WangDao/Data/labels/10102.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10352.bmp",
+                    "label": "/root/WangDao/Data/labels/10352.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10229.bmp",
+                    "label": "/root/WangDao/Data/labels/10229.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10200.bmp",
+                    "label": "/root/WangDao/Data/labels/10200.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10069.bmp",
+                    "label": "/root/WangDao/Data/labels/10069.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10366.bmp",
+                    "label": "/root/WangDao/Data/labels/10366.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10083.bmp",
+                    "label": "/root/WangDao/Data/labels/10083.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10010.bmp",
+                    "label": "/root/WangDao/Data/labels/10010.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10127.bmp",
+                    "label": "/root/WangDao/Data/labels/10127.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10125.bmp",
+                    "label": "/root/WangDao/Data/labels/10125.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10388.bmp",
+                    "label": "/root/WangDao/Data/labels/10388.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10273.bmp",
+                    "label": "/root/WangDao/Data/labels/10273.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10431.bmp",
+                    "label": "/root/WangDao/Data/labels/10431.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10023.bmp",
+                    "label": "/root/WangDao/Data/labels/10023.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10157.bmp",
+                    "label": "/root/WangDao/Data/labels/10157.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10320.bmp",
+                    "label": "/root/WangDao/Data/labels/10320.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10389.bmp",
+                    "label": "/root/WangDao/Data/labels/10389.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10058.bmp",
+                    "label": "/root/WangDao/Data/labels/10058.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10284.bmp",
+                    "label": "/root/WangDao/Data/labels/10284.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10109.bmp",
+                    "label": "/root/WangDao/Data/labels/10109.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10280.bmp",
+                    "label": "/root/WangDao/Data/labels/10280.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10159.bmp",
+                    "label": "/root/WangDao/Data/labels/10159.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10362.bmp",
+                    "label": "/root/WangDao/Data/labels/10362.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10015.bmp",
+                    "label": "/root/WangDao/Data/labels/10015.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10183.bmp",
+                    "label": "/root/WangDao/Data/labels/10183.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10171.bmp",
+                    "label": "/root/WangDao/Data/labels/10171.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10441.bmp",
+                    "label": "/root/WangDao/Data/labels/10441.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10293.bmp",
+                    "label": "/root/WangDao/Data/labels/10293.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10305.bmp",
+                    "label": "/root/WangDao/Data/labels/10305.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10363.bmp",
+                    "label": "/root/WangDao/Data/labels/10363.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10402.bmp",
+                    "label": "/root/WangDao/Data/labels/10402.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10353.bmp",
+                    "label": "/root/WangDao/Data/labels/10353.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10173.bmp",
+                    "label": "/root/WangDao/Data/labels/10173.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10474.bmp",
+                    "label": "/root/WangDao/Data/labels/10474.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10298.bmp",
+                    "label": "/root/WangDao/Data/labels/10298.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10029.bmp",
+                    "label": "/root/WangDao/Data/labels/10029.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10184.bmp",
+                    "label": "/root/WangDao/Data/labels/10184.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10385.bmp",
+                    "label": "/root/WangDao/Data/labels/10385.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10034.bmp",
+                    "label": "/root/WangDao/Data/labels/10034.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10219.bmp",
+                    "label": "/root/WangDao/Data/labels/10219.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10164.bmp",
+                    "label": "/root/WangDao/Data/labels/10164.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10499.bmp",
+                    "label": "/root/WangDao/Data/labels/10499.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10331.bmp",
+                    "label": "/root/WangDao/Data/labels/10331.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10497.bmp",
+                    "label": "/root/WangDao/Data/labels/10497.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10153.bmp",
+                    "label": "/root/WangDao/Data/labels/10153.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10115.bmp",
+                    "label": "/root/WangDao/Data/labels/10115.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10176.bmp",
+                    "label": "/root/WangDao/Data/labels/10176.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10059.bmp",
+                    "label": "/root/WangDao/Data/labels/10059.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10459.bmp",
+                    "label": "/root/WangDao/Data/labels/10459.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10193.bmp",
+                    "label": "/root/WangDao/Data/labels/10193.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10439.bmp",
+                    "label": "/root/WangDao/Data/labels/10439.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10414.bmp",
+                    "label": "/root/WangDao/Data/labels/10414.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10399.bmp",
+                    "label": "/root/WangDao/Data/labels/10399.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10384.bmp",
+                    "label": "/root/WangDao/Data/labels/10384.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10155.bmp",
+                    "label": "/root/WangDao/Data/labels/10155.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10067.bmp",
+                    "label": "/root/WangDao/Data/labels/10067.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10036.bmp",
+                    "label": "/root/WangDao/Data/labels/10036.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10070.bmp",
+                    "label": "/root/WangDao/Data/labels/10070.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10041.bmp",
+                    "label": "/root/WangDao/Data/labels/10041.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10091.bmp",
+                    "label": "/root/WangDao/Data/labels/10091.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10467.bmp",
+                    "label": "/root/WangDao/Data/labels/10467.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10418.bmp",
+                    "label": "/root/WangDao/Data/labels/10418.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10076.bmp",
+                    "label": "/root/WangDao/Data/labels/10076.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10304.bmp",
+                    "label": "/root/WangDao/Data/labels/10304.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10355.bmp",
+                    "label": "/root/WangDao/Data/labels/10355.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10480.bmp",
+                    "label": "/root/WangDao/Data/labels/10480.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10390.bmp",
+                    "label": "/root/WangDao/Data/labels/10390.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10030.bmp",
+                    "label": "/root/WangDao/Data/labels/10030.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10007.bmp",
+                    "label": "/root/WangDao/Data/labels/10007.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10382.bmp",
+                    "label": "/root/WangDao/Data/labels/10382.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10438.bmp",
+                    "label": "/root/WangDao/Data/labels/10438.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10236.bmp",
+                    "label": "/root/WangDao/Data/labels/10236.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10035.bmp",
+                    "label": "/root/WangDao/Data/labels/10035.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10231.bmp",
+                    "label": "/root/WangDao/Data/labels/10231.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10346.bmp",
+                    "label": "/root/WangDao/Data/labels/10346.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10117.bmp",
+                    "label": "/root/WangDao/Data/labels/10117.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10151.bmp",
+                    "label": "/root/WangDao/Data/labels/10151.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10129.bmp",
+                    "label": "/root/WangDao/Data/labels/10129.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10227.bmp",
+                    "label": "/root/WangDao/Data/labels/10227.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10060.bmp",
+                    "label": "/root/WangDao/Data/labels/10060.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10031.bmp",
+                    "label": "/root/WangDao/Data/labels/10031.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10114.bmp",
+                    "label": "/root/WangDao/Data/labels/10114.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10061.bmp",
+                    "label": "/root/WangDao/Data/labels/10061.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10492.bmp",
+                    "label": "/root/WangDao/Data/labels/10492.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10342.bmp",
+                    "label": "/root/WangDao/Data/labels/10342.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10413.bmp",
+                    "label": "/root/WangDao/Data/labels/10413.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10303.bmp",
+                    "label": "/root/WangDao/Data/labels/10303.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10195.bmp",
+                    "label": "/root/WangDao/Data/labels/10195.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10465.bmp",
+                    "label": "/root/WangDao/Data/labels/10465.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10145.bmp",
+                    "label": "/root/WangDao/Data/labels/10145.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10336.bmp",
+                    "label": "/root/WangDao/Data/labels/10336.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10278.bmp",
+                    "label": "/root/WangDao/Data/labels/10278.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10310.bmp",
+                    "label": "/root/WangDao/Data/labels/10310.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10291.bmp",
+                    "label": "/root/WangDao/Data/labels/10291.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10348.bmp",
+                    "label": "/root/WangDao/Data/labels/10348.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10369.bmp",
+                    "label": "/root/WangDao/Data/labels/10369.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10027.bmp",
+                    "label": "/root/WangDao/Data/labels/10027.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10398.bmp",
+                    "label": "/root/WangDao/Data/labels/10398.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10226.bmp",
+                    "label": "/root/WangDao/Data/labels/10226.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10054.bmp",
+                    "label": "/root/WangDao/Data/labels/10054.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10017.bmp",
+                    "label": "/root/WangDao/Data/labels/10017.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10272.bmp",
+                    "label": "/root/WangDao/Data/labels/10272.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10044.bmp",
+                    "label": "/root/WangDao/Data/labels/10044.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10181.bmp",
+                    "label": "/root/WangDao/Data/labels/10181.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10201.bmp",
+                    "label": "/root/WangDao/Data/labels/10201.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10097.bmp",
+                    "label": "/root/WangDao/Data/labels/10097.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10405.bmp",
+                    "label": "/root/WangDao/Data/labels/10405.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10107.bmp",
+                    "label": "/root/WangDao/Data/labels/10107.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10295.bmp",
+                    "label": "/root/WangDao/Data/labels/10295.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10249.bmp",
+                    "label": "/root/WangDao/Data/labels/10249.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10119.bmp",
+                    "label": "/root/WangDao/Data/labels/10119.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10009.bmp",
+                    "label": "/root/WangDao/Data/labels/10009.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10476.bmp",
+                    "label": "/root/WangDao/Data/labels/10476.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10053.bmp",
+                    "label": "/root/WangDao/Data/labels/10053.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10068.bmp",
+                    "label": "/root/WangDao/Data/labels/10068.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10215.bmp",
+                    "label": "/root/WangDao/Data/labels/10215.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10196.bmp",
+                    "label": "/root/WangDao/Data/labels/10196.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10365.bmp",
+                    "label": "/root/WangDao/Data/labels/10365.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10056.bmp",
+                    "label": "/root/WangDao/Data/labels/10056.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10140.bmp",
+                    "label": "/root/WangDao/Data/labels/10140.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10126.bmp",
+                    "label": "/root/WangDao/Data/labels/10126.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10050.bmp",
+                    "label": "/root/WangDao/Data/labels/10050.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10275.bmp",
+                    "label": "/root/WangDao/Data/labels/10275.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10494.bmp",
+                    "label": "/root/WangDao/Data/labels/10494.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10373.bmp",
+                    "label": "/root/WangDao/Data/labels/10373.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10344.bmp",
+                    "label": "/root/WangDao/Data/labels/10344.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10340.bmp",
+                    "label": "/root/WangDao/Data/labels/10340.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10005.bmp",
+                    "label": "/root/WangDao/Data/labels/10005.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10185.bmp",
+                    "label": "/root/WangDao/Data/labels/10185.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10460.bmp",
+                    "label": "/root/WangDao/Data/labels/10460.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10180.bmp",
+                    "label": "/root/WangDao/Data/labels/10180.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10302.bmp",
+                    "label": "/root/WangDao/Data/labels/10302.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10149.bmp",
+                    "label": "/root/WangDao/Data/labels/10149.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10475.bmp",
+                    "label": "/root/WangDao/Data/labels/10475.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10218.bmp",
+                    "label": "/root/WangDao/Data/labels/10218.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10255.bmp",
+                    "label": "/root/WangDao/Data/labels/10255.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10008.bmp",
+                    "label": "/root/WangDao/Data/labels/10008.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10088.bmp",
+                    "label": "/root/WangDao/Data/labels/10088.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10169.bmp",
+                    "label": "/root/WangDao/Data/labels/10169.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10120.bmp",
+                    "label": "/root/WangDao/Data/labels/10120.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10468.bmp",
+                    "label": "/root/WangDao/Data/labels/10468.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10270.bmp",
+                    "label": "/root/WangDao/Data/labels/10270.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10057.bmp",
+                    "label": "/root/WangDao/Data/labels/10057.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10016.bmp",
+                    "label": "/root/WangDao/Data/labels/10016.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10290.bmp",
+                    "label": "/root/WangDao/Data/labels/10290.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10308.bmp",
+                    "label": "/root/WangDao/Data/labels/10308.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10253.bmp",
+                    "label": "/root/WangDao/Data/labels/10253.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10450.bmp",
+                    "label": "/root/WangDao/Data/labels/10450.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10312.bmp",
+                    "label": "/root/WangDao/Data/labels/10312.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10454.bmp",
+                    "label": "/root/WangDao/Data/labels/10454.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10387.bmp",
+                    "label": "/root/WangDao/Data/labels/10387.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10423.bmp",
+                    "label": "/root/WangDao/Data/labels/10423.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10022.bmp",
+                    "label": "/root/WangDao/Data/labels/10022.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10174.bmp",
+                    "label": "/root/WangDao/Data/labels/10174.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10163.bmp",
+                    "label": "/root/WangDao/Data/labels/10163.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10162.bmp",
+                    "label": "/root/WangDao/Data/labels/10162.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10154.bmp",
+                    "label": "/root/WangDao/Data/labels/10154.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10248.bmp",
+                    "label": "/root/WangDao/Data/labels/10248.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10187.bmp",
+                    "label": "/root/WangDao/Data/labels/10187.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10285.bmp",
+                    "label": "/root/WangDao/Data/labels/10285.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10279.bmp",
+                    "label": "/root/WangDao/Data/labels/10279.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10210.bmp",
+                    "label": "/root/WangDao/Data/labels/10210.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10424.bmp",
+                    "label": "/root/WangDao/Data/labels/10424.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10089.bmp",
+                    "label": "/root/WangDao/Data/labels/10089.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10186.bmp",
+                    "label": "/root/WangDao/Data/labels/10186.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10481.bmp",
+                    "label": "/root/WangDao/Data/labels/10481.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10486.bmp",
+                    "label": "/root/WangDao/Data/labels/10486.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10358.bmp",
+                    "label": "/root/WangDao/Data/labels/10358.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10139.bmp",
+                    "label": "/root/WangDao/Data/labels/10139.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10122.bmp",
+                    "label": "/root/WangDao/Data/labels/10122.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10072.bmp",
+                    "label": "/root/WangDao/Data/labels/10072.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10094.bmp",
+                    "label": "/root/WangDao/Data/labels/10094.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10455.bmp",
+                    "label": "/root/WangDao/Data/labels/10455.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10024.bmp",
+                    "label": "/root/WangDao/Data/labels/10024.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10104.bmp",
+                    "label": "/root/WangDao/Data/labels/10104.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10311.bmp",
+                    "label": "/root/WangDao/Data/labels/10311.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10071.bmp",
+                    "label": "/root/WangDao/Data/labels/10071.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10113.bmp",
+                    "label": "/root/WangDao/Data/labels/10113.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10287.bmp",
+                    "label": "/root/WangDao/Data/labels/10287.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10392.bmp",
+                    "label": "/root/WangDao/Data/labels/10392.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10230.bmp",
+                    "label": "/root/WangDao/Data/labels/10230.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10335.bmp",
+                    "label": "/root/WangDao/Data/labels/10335.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10397.bmp",
+                    "label": "/root/WangDao/Data/labels/10397.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10239.bmp",
+                    "label": "/root/WangDao/Data/labels/10239.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10217.bmp",
+                    "label": "/root/WangDao/Data/labels/10217.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10121.bmp",
+                    "label": "/root/WangDao/Data/labels/10121.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10473.bmp",
+                    "label": "/root/WangDao/Data/labels/10473.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10019.bmp",
+                    "label": "/root/WangDao/Data/labels/10019.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10313.bmp",
+                    "label": "/root/WangDao/Data/labels/10313.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10143.bmp",
+                    "label": "/root/WangDao/Data/labels/10143.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10146.bmp",
+                    "label": "/root/WangDao/Data/labels/10146.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10410.bmp",
+                    "label": "/root/WangDao/Data/labels/10410.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10393.bmp",
+                    "label": "/root/WangDao/Data/labels/10393.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10136.bmp",
+                    "label": "/root/WangDao/Data/labels/10136.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10090.bmp",
+                    "label": "/root/WangDao/Data/labels/10090.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10011.bmp",
+                    "label": "/root/WangDao/Data/labels/10011.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10345.bmp",
+                    "label": "/root/WangDao/Data/labels/10345.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10225.bmp",
+                    "label": "/root/WangDao/Data/labels/10225.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10066.bmp",
+                    "label": "/root/WangDao/Data/labels/10066.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10464.bmp",
+                    "label": "/root/WangDao/Data/labels/10464.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10317.bmp",
+                    "label": "/root/WangDao/Data/labels/10317.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10268.bmp",
+                    "label": "/root/WangDao/Data/labels/10268.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10261.bmp",
+                    "label": "/root/WangDao/Data/labels/10261.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10496.bmp",
+                    "label": "/root/WangDao/Data/labels/10496.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10198.bmp",
+                    "label": "/root/WangDao/Data/labels/10198.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10003.bmp",
+                    "label": "/root/WangDao/Data/labels/10003.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10406.bmp",
+                    "label": "/root/WangDao/Data/labels/10406.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10138.bmp",
+                    "label": "/root/WangDao/Data/labels/10138.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10213.bmp",
+                    "label": "/root/WangDao/Data/labels/10213.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10444.bmp",
+                    "label": "/root/WangDao/Data/labels/10444.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10263.bmp",
+                    "label": "/root/WangDao/Data/labels/10263.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10299.bmp",
+                    "label": "/root/WangDao/Data/labels/10299.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10324.bmp",
+                    "label": "/root/WangDao/Data/labels/10324.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10415.bmp",
+                    "label": "/root/WangDao/Data/labels/10415.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10251.bmp",
+                    "label": "/root/WangDao/Data/labels/10251.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10081.bmp",
+                    "label": "/root/WangDao/Data/labels/10081.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10354.bmp",
+                    "label": "/root/WangDao/Data/labels/10354.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10498.bmp",
+                    "label": "/root/WangDao/Data/labels/10498.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10386.bmp",
+                    "label": "/root/WangDao/Data/labels/10386.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10006.bmp",
+                    "label": "/root/WangDao/Data/labels/10006.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10493.bmp",
+                    "label": "/root/WangDao/Data/labels/10493.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10461.bmp",
+                    "label": "/root/WangDao/Data/labels/10461.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10042.bmp",
+                    "label": "/root/WangDao/Data/labels/10042.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10457.bmp",
+                    "label": "/root/WangDao/Data/labels/10457.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10288.bmp",
+                    "label": "/root/WangDao/Data/labels/10288.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10206.bmp",
+                    "label": "/root/WangDao/Data/labels/10206.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10491.bmp",
+                    "label": "/root/WangDao/Data/labels/10491.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10203.bmp",
+                    "label": "/root/WangDao/Data/labels/10203.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10049.bmp",
+                    "label": "/root/WangDao/Data/labels/10049.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10432.bmp",
+                    "label": "/root/WangDao/Data/labels/10432.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10124.bmp",
+                    "label": "/root/WangDao/Data/labels/10124.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10343.bmp",
+                    "label": "/root/WangDao/Data/labels/10343.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10232.bmp",
+                    "label": "/root/WangDao/Data/labels/10232.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10330.bmp",
+                    "label": "/root/WangDao/Data/labels/10330.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10379.bmp",
+                    "label": "/root/WangDao/Data/labels/10379.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10018.bmp",
+                    "label": "/root/WangDao/Data/labels/10018.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10026.bmp",
+                    "label": "/root/WangDao/Data/labels/10026.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10202.bmp",
+                    "label": "/root/WangDao/Data/labels/10202.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10495.bmp",
+                    "label": "/root/WangDao/Data/labels/10495.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10347.bmp",
+                    "label": "/root/WangDao/Data/labels/10347.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10442.bmp",
+                    "label": "/root/WangDao/Data/labels/10442.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10045.bmp",
+                    "label": "/root/WangDao/Data/labels/10045.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10306.bmp",
+                    "label": "/root/WangDao/Data/labels/10306.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10276.bmp",
+                    "label": "/root/WangDao/Data/labels/10276.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10375.bmp",
+                    "label": "/root/WangDao/Data/labels/10375.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10407.bmp",
+                    "label": "/root/WangDao/Data/labels/10407.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10351.bmp",
+                    "label": "/root/WangDao/Data/labels/10351.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10095.bmp",
+                    "label": "/root/WangDao/Data/labels/10095.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10350.bmp",
+                    "label": "/root/WangDao/Data/labels/10350.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10002.bmp",
+                    "label": "/root/WangDao/Data/labels/10002.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10190.bmp",
+                    "label": "/root/WangDao/Data/labels/10190.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10082.bmp",
+                    "label": "/root/WangDao/Data/labels/10082.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10296.bmp",
+                    "label": "/root/WangDao/Data/labels/10296.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10318.bmp",
+                    "label": "/root/WangDao/Data/labels/10318.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10240.bmp",
+                    "label": "/root/WangDao/Data/labels/10240.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10401.bmp",
+                    "label": "/root/WangDao/Data/labels/10401.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10391.bmp",
+                    "label": "/root/WangDao/Data/labels/10391.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10325.bmp",
+                    "label": "/root/WangDao/Data/labels/10325.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10216.bmp",
+                    "label": "/root/WangDao/Data/labels/10216.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10085.bmp",
+                    "label": "/root/WangDao/Data/labels/10085.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10040.bmp",
+                    "label": "/root/WangDao/Data/labels/10040.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10435.bmp",
+                    "label": "/root/WangDao/Data/labels/10435.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10242.bmp",
+                    "label": "/root/WangDao/Data/labels/10242.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10323.bmp",
+                    "label": "/root/WangDao/Data/labels/10323.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10160.bmp",
+                    "label": "/root/WangDao/Data/labels/10160.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10170.bmp",
+                    "label": "/root/WangDao/Data/labels/10170.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10265.bmp",
+                    "label": "/root/WangDao/Data/labels/10265.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10039.bmp",
+                    "label": "/root/WangDao/Data/labels/10039.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10033.bmp",
+                    "label": "/root/WangDao/Data/labels/10033.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10168.bmp",
+                    "label": "/root/WangDao/Data/labels/10168.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10326.bmp",
+                    "label": "/root/WangDao/Data/labels/10326.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10337.bmp",
+                    "label": "/root/WangDao/Data/labels/10337.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10332.bmp",
+                    "label": "/root/WangDao/Data/labels/10332.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10046.bmp",
+                    "label": "/root/WangDao/Data/labels/10046.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10182.bmp",
+                    "label": "/root/WangDao/Data/labels/10182.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10245.bmp",
+                    "label": "/root/WangDao/Data/labels/10245.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10165.bmp",
+                    "label": "/root/WangDao/Data/labels/10165.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10489.bmp",
+                    "label": "/root/WangDao/Data/labels/10489.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10370.bmp",
+                    "label": "/root/WangDao/Data/labels/10370.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10256.bmp",
+                    "label": "/root/WangDao/Data/labels/10256.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10471.bmp",
+                    "label": "/root/WangDao/Data/labels/10471.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10380.bmp",
+                    "label": "/root/WangDao/Data/labels/10380.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10408.bmp",
+                    "label": "/root/WangDao/Data/labels/10408.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10116.bmp",
+                    "label": "/root/WangDao/Data/labels/10116.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10167.bmp",
+                    "label": "/root/WangDao/Data/labels/10167.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10429.bmp",
+                    "label": "/root/WangDao/Data/labels/10429.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10395.bmp",
+                    "label": "/root/WangDao/Data/labels/10395.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10447.bmp",
+                    "label": "/root/WangDao/Data/labels/10447.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10283.bmp",
+                    "label": "/root/WangDao/Data/labels/10283.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10411.bmp",
+                    "label": "/root/WangDao/Data/labels/10411.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10096.bmp",
+                    "label": "/root/WangDao/Data/labels/10096.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10241.bmp",
+                    "label": "/root/WangDao/Data/labels/10241.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10371.bmp",
+                    "label": "/root/WangDao/Data/labels/10371.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10207.bmp",
+                    "label": "/root/WangDao/Data/labels/10207.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10277.bmp",
+                    "label": "/root/WangDao/Data/labels/10277.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10322.bmp",
+                    "label": "/root/WangDao/Data/labels/10322.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10047.bmp",
+                    "label": "/root/WangDao/Data/labels/10047.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10020.bmp",
+                    "label": "/root/WangDao/Data/labels/10020.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10175.bmp",
+                    "label": "/root/WangDao/Data/labels/10175.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10462.bmp",
+                    "label": "/root/WangDao/Data/labels/10462.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10274.bmp",
+                    "label": "/root/WangDao/Data/labels/10274.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10281.bmp",
+                    "label": "/root/WangDao/Data/labels/10281.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10440.bmp",
+                    "label": "/root/WangDao/Data/labels/10440.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10092.bmp",
+                    "label": "/root/WangDao/Data/labels/10092.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10038.bmp",
+                    "label": "/root/WangDao/Data/labels/10038.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10147.bmp",
+                    "label": "/root/WangDao/Data/labels/10147.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10267.bmp",
+                    "label": "/root/WangDao/Data/labels/10267.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10264.bmp",
+                    "label": "/root/WangDao/Data/labels/10264.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10214.bmp",
+                    "label": "/root/WangDao/Data/labels/10214.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10212.bmp",
+                    "label": "/root/WangDao/Data/labels/10212.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10051.bmp",
+                    "label": "/root/WangDao/Data/labels/10051.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10257.bmp",
+                    "label": "/root/WangDao/Data/labels/10257.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10478.bmp",
+                    "label": "/root/WangDao/Data/labels/10478.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10014.bmp",
+                    "label": "/root/WangDao/Data/labels/10014.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10075.bmp",
+                    "label": "/root/WangDao/Data/labels/10075.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10381.bmp",
+                    "label": "/root/WangDao/Data/labels/10381.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10123.bmp",
+                    "label": "/root/WangDao/Data/labels/10123.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10463.bmp",
+                    "label": "/root/WangDao/Data/labels/10463.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10260.bmp",
+                    "label": "/root/WangDao/Data/labels/10260.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10484.bmp",
+                    "label": "/root/WangDao/Data/labels/10484.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10309.bmp",
+                    "label": "/root/WangDao/Data/labels/10309.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10128.bmp",
+                    "label": "/root/WangDao/Data/labels/10128.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10315.bmp",
+                    "label": "/root/WangDao/Data/labels/10315.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10483.bmp",
+                    "label": "/root/WangDao/Data/labels/10483.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10449.bmp",
+                    "label": "/root/WangDao/Data/labels/10449.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10074.bmp",
+                    "label": "/root/WangDao/Data/labels/10074.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10012.bmp",
+                    "label": "/root/WangDao/Data/labels/10012.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10294.bmp",
+                    "label": "/root/WangDao/Data/labels/10294.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10409.bmp",
+                    "label": "/root/WangDao/Data/labels/10409.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10258.bmp",
+                    "label": "/root/WangDao/Data/labels/10258.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10135.bmp",
+                    "label": "/root/WangDao/Data/labels/10135.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10191.bmp",
+                    "label": "/root/WangDao/Data/labels/10191.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10412.bmp",
+                    "label": "/root/WangDao/Data/labels/10412.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10178.bmp",
+                    "label": "/root/WangDao/Data/labels/10178.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10319.bmp",
+                    "label": "/root/WangDao/Data/labels/10319.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10086.bmp",
+                    "label": "/root/WangDao/Data/labels/10086.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10419.bmp",
+                    "label": "/root/WangDao/Data/labels/10419.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10364.bmp",
+                    "label": "/root/WangDao/Data/labels/10364.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10101.bmp",
+                    "label": "/root/WangDao/Data/labels/10101.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10001.bmp",
+                    "label": "/root/WangDao/Data/labels/10001.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10445.bmp",
+                    "label": "/root/WangDao/Data/labels/10445.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10064.bmp",
+                    "label": "/root/WangDao/Data/labels/10064.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10374.bmp",
+                    "label": "/root/WangDao/Data/labels/10374.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10247.bmp",
+                    "label": "/root/WangDao/Data/labels/10247.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10470.bmp",
+                    "label": "/root/WangDao/Data/labels/10470.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10356.bmp",
+                    "label": "/root/WangDao/Data/labels/10356.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10234.bmp",
+                    "label": "/root/WangDao/Data/labels/10234.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10179.bmp",
+                    "label": "/root/WangDao/Data/labels/10179.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10490.bmp",
+                    "label": "/root/WangDao/Data/labels/10490.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10084.bmp",
+                    "label": "/root/WangDao/Data/labels/10084.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10108.bmp",
+                    "label": "/root/WangDao/Data/labels/10108.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10436.bmp",
+                    "label": "/root/WangDao/Data/labels/10436.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10327.bmp",
+                    "label": "/root/WangDao/Data/labels/10327.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10378.bmp",
+                    "label": "/root/WangDao/Data/labels/10378.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10482.bmp",
+                    "label": "/root/WangDao/Data/labels/10482.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10246.bmp",
+                    "label": "/root/WangDao/Data/labels/10246.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10286.bmp",
+                    "label": "/root/WangDao/Data/labels/10286.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10172.bmp",
+                    "label": "/root/WangDao/Data/labels/10172.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10156.bmp",
+                    "label": "/root/WangDao/Data/labels/10156.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10209.bmp",
+                    "label": "/root/WangDao/Data/labels/10209.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10244.bmp",
+                    "label": "/root/WangDao/Data/labels/10244.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10032.bmp",
+                    "label": "/root/WangDao/Data/labels/10032.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10199.bmp",
+                    "label": "/root/WangDao/Data/labels/10199.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10417.bmp",
+                    "label": "/root/WangDao/Data/labels/10417.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10367.bmp",
+                    "label": "/root/WangDao/Data/labels/10367.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10130.bmp",
+                    "label": "/root/WangDao/Data/labels/10130.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10307.bmp",
+                    "label": "/root/WangDao/Data/labels/10307.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10004.bmp",
+                    "label": "/root/WangDao/Data/labels/10004.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10359.bmp",
+                    "label": "/root/WangDao/Data/labels/10359.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10259.bmp",
+                    "label": "/root/WangDao/Data/labels/10259.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10228.bmp",
+                    "label": "/root/WangDao/Data/labels/10228.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10093.bmp",
+                    "label": "/root/WangDao/Data/labels/10093.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10099.bmp",
+                    "label": "/root/WangDao/Data/labels/10099.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10238.bmp",
+                    "label": "/root/WangDao/Data/labels/10238.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10456.bmp",
+                    "label": "/root/WangDao/Data/labels/10456.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10052.bmp",
+                    "label": "/root/WangDao/Data/labels/10052.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10205.bmp",
+                    "label": "/root/WangDao/Data/labels/10205.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10289.bmp",
+                    "label": "/root/WangDao/Data/labels/10289.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10197.bmp",
+                    "label": "/root/WangDao/Data/labels/10197.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10425.bmp",
+                    "label": "/root/WangDao/Data/labels/10425.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10254.bmp",
+                    "label": "/root/WangDao/Data/labels/10254.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10252.bmp",
+                    "label": "/root/WangDao/Data/labels/10252.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10065.bmp",
+                    "label": "/root/WangDao/Data/labels/10065.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10372.bmp",
+                    "label": "/root/WangDao/Data/labels/10372.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10106.bmp",
+                    "label": "/root/WangDao/Data/labels/10106.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10013.bmp",
+                    "label": "/root/WangDao/Data/labels/10013.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10043.bmp",
+                    "label": "/root/WangDao/Data/labels/10043.bmp"
+                }
+            ]
+        },
+        "val": {
+            "Use_dataenhance": false,
+            "data_per_picture": 1,
+            "preprocess": [
+                {
+                    "type": "Resize",
+                    "params": {
+                        "size": [
+                            400,
+                            400
+                        ]
+                    },
+                    "target": "both"
+                },
+                {
+                    "type": "RandomEqualize",
+                    "params": {
+                        "p": 1.0
+                    },
+                    "target": "image"
+                },
+                {
+                    "type": "ToTensor",
+                    "target": "both"
+                }
+            ],
+            "picture_type": {
+                "image": "L",
+                "label": "L"
+            },
+            "dataloader_args": {
+                "batch_size": 8,
+                "shuffle": false,
+                "num_workers": 2
+            },
+            "data": [
+                {
+                    "image": "/root/WangDao/Data/images/10400.bmp",
+                    "label": "/root/WangDao/Data/labels/10400.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10103.bmp",
+                    "label": "/root/WangDao/Data/labels/10103.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10098.bmp",
+                    "label": "/root/WangDao/Data/labels/10098.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10430.bmp",
+                    "label": "/root/WangDao/Data/labels/10430.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10105.bmp",
+                    "label": "/root/WangDao/Data/labels/10105.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10421.bmp",
+                    "label": "/root/WangDao/Data/labels/10421.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10220.bmp",
+                    "label": "/root/WangDao/Data/labels/10220.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10338.bmp",
+                    "label": "/root/WangDao/Data/labels/10338.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10487.bmp",
+                    "label": "/root/WangDao/Data/labels/10487.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10152.bmp",
+                    "label": "/root/WangDao/Data/labels/10152.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10300.bmp",
+                    "label": "/root/WangDao/Data/labels/10300.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10329.bmp",
+                    "label": "/root/WangDao/Data/labels/10329.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10048.bmp",
+                    "label": "/root/WangDao/Data/labels/10048.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10211.bmp",
+                    "label": "/root/WangDao/Data/labels/10211.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10349.bmp",
+                    "label": "/root/WangDao/Data/labels/10349.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10055.bmp",
+                    "label": "/root/WangDao/Data/labels/10055.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10446.bmp",
+                    "label": "/root/WangDao/Data/labels/10446.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10416.bmp",
+                    "label": "/root/WangDao/Data/labels/10416.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10266.bmp",
+                    "label": "/root/WangDao/Data/labels/10266.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10177.bmp",
+                    "label": "/root/WangDao/Data/labels/10177.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10087.bmp",
+                    "label": "/root/WangDao/Data/labels/10087.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10427.bmp",
+                    "label": "/root/WangDao/Data/labels/10427.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10357.bmp",
+                    "label": "/root/WangDao/Data/labels/10357.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10448.bmp",
+                    "label": "/root/WangDao/Data/labels/10448.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10188.bmp",
+                    "label": "/root/WangDao/Data/labels/10188.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10141.bmp",
+                    "label": "/root/WangDao/Data/labels/10141.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10189.bmp",
+                    "label": "/root/WangDao/Data/labels/10189.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10062.bmp",
+                    "label": "/root/WangDao/Data/labels/10062.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10111.bmp",
+                    "label": "/root/WangDao/Data/labels/10111.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10466.bmp",
+                    "label": "/root/WangDao/Data/labels/10466.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10063.bmp",
+                    "label": "/root/WangDao/Data/labels/10063.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10443.bmp",
+                    "label": "/root/WangDao/Data/labels/10443.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10237.bmp",
+                    "label": "/root/WangDao/Data/labels/10237.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10262.bmp",
+                    "label": "/root/WangDao/Data/labels/10262.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10112.bmp",
+                    "label": "/root/WangDao/Data/labels/10112.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10394.bmp",
+                    "label": "/root/WangDao/Data/labels/10394.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10194.bmp",
+                    "label": "/root/WangDao/Data/labels/10194.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10328.bmp",
+                    "label": "/root/WangDao/Data/labels/10328.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10339.bmp",
+                    "label": "/root/WangDao/Data/labels/10339.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10451.bmp",
+                    "label": "/root/WangDao/Data/labels/10451.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10269.bmp",
+                    "label": "/root/WangDao/Data/labels/10269.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10488.bmp",
+                    "label": "/root/WangDao/Data/labels/10488.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10110.bmp",
+                    "label": "/root/WangDao/Data/labels/10110.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10021.bmp",
+                    "label": "/root/WangDao/Data/labels/10021.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10472.bmp",
+                    "label": "/root/WangDao/Data/labels/10472.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10243.bmp",
+                    "label": "/root/WangDao/Data/labels/10243.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10073.bmp",
+                    "label": "/root/WangDao/Data/labels/10073.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10368.bmp",
+                    "label": "/root/WangDao/Data/labels/10368.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10479.bmp",
+                    "label": "/root/WangDao/Data/labels/10479.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10469.bmp",
+                    "label": "/root/WangDao/Data/labels/10469.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10192.bmp",
+                    "label": "/root/WangDao/Data/labels/10192.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10158.bmp",
+                    "label": "/root/WangDao/Data/labels/10158.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10037.bmp",
+                    "label": "/root/WangDao/Data/labels/10037.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10422.bmp",
+                    "label": "/root/WangDao/Data/labels/10422.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10148.bmp",
+                    "label": "/root/WangDao/Data/labels/10148.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10100.bmp",
+                    "label": "/root/WangDao/Data/labels/10100.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10292.bmp",
+                    "label": "/root/WangDao/Data/labels/10292.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10404.bmp",
+                    "label": "/root/WangDao/Data/labels/10404.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10079.bmp",
+                    "label": "/root/WangDao/Data/labels/10079.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10223.bmp",
+                    "label": "/root/WangDao/Data/labels/10223.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10028.bmp",
+                    "label": "/root/WangDao/Data/labels/10028.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10235.bmp",
+                    "label": "/root/WangDao/Data/labels/10235.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10433.bmp",
+                    "label": "/root/WangDao/Data/labels/10433.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10437.bmp",
+                    "label": "/root/WangDao/Data/labels/10437.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10377.bmp",
+                    "label": "/root/WangDao/Data/labels/10377.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10314.bmp",
+                    "label": "/root/WangDao/Data/labels/10314.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10233.bmp",
+                    "label": "/root/WangDao/Data/labels/10233.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10150.bmp",
+                    "label": "/root/WangDao/Data/labels/10150.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10458.bmp",
+                    "label": "/root/WangDao/Data/labels/10458.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10403.bmp",
+                    "label": "/root/WangDao/Data/labels/10403.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10221.bmp",
+                    "label": "/root/WangDao/Data/labels/10221.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10224.bmp",
+                    "label": "/root/WangDao/Data/labels/10224.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10131.bmp",
+                    "label": "/root/WangDao/Data/labels/10131.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10222.bmp",
+                    "label": "/root/WangDao/Data/labels/10222.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10080.bmp",
+                    "label": "/root/WangDao/Data/labels/10080.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10316.bmp",
+                    "label": "/root/WangDao/Data/labels/10316.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10396.bmp",
+                    "label": "/root/WangDao/Data/labels/10396.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10297.bmp",
+                    "label": "/root/WangDao/Data/labels/10297.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10078.bmp",
+                    "label": "/root/WangDao/Data/labels/10078.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10161.bmp",
+                    "label": "/root/WangDao/Data/labels/10161.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10426.bmp",
+                    "label": "/root/WangDao/Data/labels/10426.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10376.bmp",
+                    "label": "/root/WangDao/Data/labels/10376.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10142.bmp",
+                    "label": "/root/WangDao/Data/labels/10142.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10137.bmp",
+                    "label": "/root/WangDao/Data/labels/10137.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10301.bmp",
+                    "label": "/root/WangDao/Data/labels/10301.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10360.bmp",
+                    "label": "/root/WangDao/Data/labels/10360.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10132.bmp",
+                    "label": "/root/WangDao/Data/labels/10132.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10334.bmp",
+                    "label": "/root/WangDao/Data/labels/10334.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10500.bmp",
+                    "label": "/root/WangDao/Data/labels/10500.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10204.bmp",
+                    "label": "/root/WangDao/Data/labels/10204.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10166.bmp",
+                    "label": "/root/WangDao/Data/labels/10166.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10144.bmp",
+                    "label": "/root/WangDao/Data/labels/10144.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10208.bmp",
+                    "label": "/root/WangDao/Data/labels/10208.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10477.bmp",
+                    "label": "/root/WangDao/Data/labels/10477.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10282.bmp",
+                    "label": "/root/WangDao/Data/labels/10282.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10434.bmp",
+                    "label": "/root/WangDao/Data/labels/10434.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10133.bmp",
+                    "label": "/root/WangDao/Data/labels/10133.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10420.bmp",
+                    "label": "/root/WangDao/Data/labels/10420.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10118.bmp",
+                    "label": "/root/WangDao/Data/labels/10118.bmp"
+                },
+                {
+                    "image": "/root/WangDao/Data/images/10077.bmp",
+                    "label": "/root/WangDao/Data/labels/10077.bmp"
+                }
+            ]
+        },
+        "test": {
+            "Use_dataenhance": false,
+            "data_per_picture": 1,
+            "preprocess": [
+                {
+                    "type": "Resize",
+                    "params": {
+                        "size": [
+                            400,
+                            400
+                        ]
+                    },
+                    "target": "image"
+                },
+                {
+                    "type": "RandomEqualize",
+                    "params": {
+                        "p": 1.0
+                    },
+                    "target": "image"
+                },
+                {
+                    "type": "ToTensor",
+                    "target": "image"
+                }
+            ],
+            "picture_type": {
+                "image": "L"
+            },
+            "dataloader_args": {
+                "batch_size": 1,
+                "shuffle": false
+            },
+            "data": []
+        }
+    },
+    "statistics": {
+        "train_data_size": 4000,
+        "val_data_size": 100,
+        "test_data_size": 0,
+        "train_dataloader_size": 50,
+        "val_dataloader_size": 12,
+        "test_dataloader_size": 0,
+        "Creat_time": "2025-11-06 21:20:52"
+    }
+}

@@ -3,142 +3,20 @@ import os
 import glob
 from torch.cuda import is_available as cuda_available
 from Code2D.ConfigTool import *
+from Code2D import model_train
+from Code2D import get_default_config
 import random
-from Default_config import get_defult_config
-
-config = get_defult_config()
-# get_defult_config()返回默认配置
-# 包含model、loss、optimizer、scheduler、training、logging、early_stopping七个配置项
 
 
-target_size = (400, 400)
-imagetype = 'L'
-labeltype = 'L'
+config = get_default_config(config_name="config_13.json")
+# get_default_config()返回默认配置
 
+# ------------------- 日志数据配置 -------------------
+log_path = getpath('TRAIN_RECORD','record')
+config['logging']['log_dir'] = os.path.join("./", log_path)
+config['early_stopping']['model_save_path'] = os.path.join(log_path, "best_model.pth")
 # ------------------- 训练数据配置 -------------------
-train_data_enhance = [
-    {
-        "type": "Resize",
-        "params": {"size": target_size},
-        "target": "both"
-    },
-    {
-        "type": "RandomEqualize",
-        "params": {
-            "p": 1.0
-        },
-        "target": "image"
-    },
-    {
-        "type": "RandomRotate",
-        "params": {
-            "p": 0.6,
-            "max_angle": 30
-        },
-        "target": "both"
-    },
-    {
-        "type": "RandomFlip",
-        "params": {
-            "p": 0.5,
-            "direction": "horizontal"
-        },
-        "target": "both"
-    },
-    {
-        "type": "RandomFlip",
-        "params": {
-            "p": 0.5,
-            "direction": "vertical"
-        },
-        "target": "both"
-    },
-    {
-        "type": "RandomMask",
-        "params": {
-            "p_large": 0.3,
-            "p_small": 0.2,
-            "angle_range": [0, 360],
-            "move_range": [170, 180],
-            "radius_range": [320, 340]
-        },
-        "target": "both"
-    },
-    {
-        "type": "ToTensor",
-        "target": "both"
-    },
-    {
-        "type": "AddGaussianNoise",
-        "params": {
-            "p": 0.5,
-            "mean": 0,
-            "var": 0.01
-        },
-        "target": "image"
-    }
-]
 
-dataconfig = {
-    "train": {
-        "Use_dataenhance": True,        # 训练集启用数据增强
-        "data_per_picture": 10,          # 每张图片生成的训练样本数
-        'preprocess': train_data_enhance,
-        'picture_type': {
-            'image': imagetype,
-            'label': labeltype
-        },
-        'dataloader_args': {
-            'batch_size': 8,
-            'shuffle': True,
-            'num_workers': 4
-        }
-    },
-    "val": {
-        "Use_dataenhance": False,       # 验证集禁用数据增强
-        "data_per_picture": 1,          # 验证集保持原始数据（不增强）
-        'preprocess': [
-            {'type': 'Resize', 'params': {'size': target_size}, 'target': 'both'},
-            {'type': 'RandomEqualize', 'params': {'p': 1.0}, 'target': 'image'},
-            {"type": "RandomMask","params": 
-                {
-                    "p_large": 0.3,
-                    "p_small": 0.2,
-                    "angle_range": [0, 360],
-                    "move_range": [170, 180],
-                    "radius_range": [320, 340]
-                },
-                "target": "both"
-            },
-            {'type': 'ToTensor', 'target': 'both'}
-        ],
-        'picture_type': {
-            'image': imagetype,
-            'label': labeltype
-        },
-        'dataloader_args': {
-            'batch_size': 8,
-            'shuffle': False,
-            'num_workers': 2
-        }
-    },
-    "test": {
-        "Use_dataenhance": False,       # 测试集禁用数据增强
-        "data_per_picture": 1,          # 测试集保持原始数据（不增强）
-        "preprocess": [
-            {'type': 'Resize', 'params': {'size': target_size}, 'target': 'image'},
-            {'type': 'RandomEqualize', 'params': {'p': 1.0}, 'target': 'image'},
-            {'type': 'ToTensor', 'target': 'image'}
-        ],
-        'picture_type': {
-            'image': imagetype
-        },
-        'dataloader_args': {
-            'batch_size': 1,
-            'shuffle': False
-        },
-    }
-}
 
 # 动态生成数据路径
 device = "cuda" if cuda_available() else "cpu"
@@ -148,7 +26,7 @@ device = "cuda" if cuda_available() else "cpu"
 print("Start making Data...")
 if device == "cuda":
     # data_path = r"C:\\Users\\Dell\\Desktop\\WDprogram\\OCTA2D"
-    data_path = r"/root/WangDao/Data"
+    data_path = r"/root/WangDao/2DU-net/DATA/TrainData"
 else:
     data_path = r"D:\\C_File\\WDdata\\OCTA2D"
 
@@ -160,11 +38,13 @@ else:
 
 # 定义四个子目录
 image_dirs = [os.path.join(data_path, "images"),
-              #os.path.join(data_path, "Moreimages")
+              os.path.join(data_path, "newimages1"),
+              os.path.join(data_path, "newimages2")
               ]
 
 label_dirs = [os.path.join(data_path, "labels"),
-              #os.path.join(data_path, "Morelabels")
+                os.path.join(data_path, "newlabels1"),
+                os.path.join(data_path, "newlabels2")
               ]
 
 # 读取并合并所有图像路径
@@ -200,25 +80,41 @@ image_files, label_files = zip(*combined_files)
 
 # 划分训练集和验证集（8:2）
 split_idx = int(len(image_files) * 0.8)
-dataconfig['train']['data'] = [
+config['data']['train']['data'] = [
     {'image': img, 'label': lbl} 
     for img, lbl in zip(image_files[:split_idx], label_files[:split_idx])
 ]
-dataconfig['val']['data'] = [
+config['data']['val']['data'] = [
     {'image': img, 'label': lbl} 
     for img, lbl in zip(image_files[split_idx:], label_files[split_idx:])
 ]
-dataconfig['test']['data'] = []
+config['data']['test']['data'] = []
 
-  
-config['data'] = dataconfig
 
 # ------------------- 配置文件检查 --------------------
 
-check_config(config)
+check_config(config) # 检查配置并写入statistic部分
 
 # ------------------- 写入训练配置 --------------------
 configpath = 'config.json'
 with open(configpath, 'w', encoding='utf-8') as f:
     json.dump(config, f, indent=4, ensure_ascii=False)
 print(f"config file saved to: \n{os.path.abspath(configpath)}")
+
+# ------------------- 执行训练 -------------------
+PREDICT_NOW = False
+if PREDICT_NOW:
+    model_train(configpath)
+else:
+    print(f"是否执行训练...")
+    # 询问用户，输入Y执行，N退出，其余重新输入
+    while True:
+        user_input = input("是否执行训练？(Y/N): ").strip().upper()
+        if user_input == 'Y':
+            model_train(configpath)
+            break
+        elif user_input == 'N':
+            print("退出程序,请手动执行训练代码")
+            break
+        else:
+            print("无效输入，请输入Y或N。")

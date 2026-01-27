@@ -58,10 +58,13 @@ config['data']['test']['data'] = [
 test_config = {
     "model_path":model_path,
     "output_dir":output_path,
+    # "binarization":{
+    #     "name": "HysteresisThreshold",
+    #     "low_threshold": 0.4,
+    #     "high_threshold": 0.8
+    # },    
     "binarization":{
-        "name": "HysteresisThreshold",
-        "low_threshold": 0.4,
-        "high_threshold": 0.8
+        "name": "Remain_probability_process",
     },
     "input_nifty": input_nifty_path,
 }
