@@ -47,48 +47,40 @@ label_dirs = [os.path.join(data_path, "labels"),
                 os.path.join(data_path, "newlabels2")
               ]
 
-# 读取并合并所有图像路径
-image_files = []
-for d in image_dirs:
-    image_files.extend(sorted(glob.glob(os.path.join(d, "*.bmp"))))
-    image_files.extend(sorted(glob.glob(os.path.join(d, "*.png"))))
+assert len(image_dirs) == len(label_dirs), "图像目录和标签目录数量不匹配！"
 
-# 读取并合并所有标签路径
-label_files = []
-for d in label_dirs:
-    label_files.extend(sorted(glob.glob(os.path.join(d, "*.bmp"))))
-    label_files.extend(sorted(glob.glob(os.path.join(d, "*.png"))))
-
-'''
-# DRIVE
-data_path = r"C:\\Users\\Dell\\Desktop\\WDprogram\\DRIVE"
-
-image_files1 = sorted(glob.glob(os.path.join(data_path, "training\\images", "*.tif")))
-label_files1 = sorted(glob.glob(os.path.join(data_path, "training\\1st_manual", "*.gif")))
-
-image_files2 = sorted(glob.glob(os.path.join(data_path, "test\\images", "*.tif")))
-label_files2 = sorted(glob.glob(os.path.join(data_path, "test\\1st_manual", "*.gif")))
-
-image_files = image_files1 + image_files2
-label_files = label_files1 + label_files2
-'''
-
-# 打乱文件列表
-combined_files = list(zip(image_files, label_files))
-random.shuffle(combined_files)
-image_files, label_files = zip(*combined_files)
-
-# 划分训练集和验证集（8:2）
-split_idx = int(len(image_files) * 0.8)
-config['data']['train']['data'] = [
-    {'image': img, 'label': lbl} 
-    for img, lbl in zip(image_files[:split_idx], label_files[:split_idx])
-]
-config['data']['val']['data'] = [
-    {'image': img, 'label': lbl} 
-    for img, lbl in zip(image_files[split_idx:], label_files[split_idx:])
-]
+#  清空训练集、验证集、测试集
+config['data']['train']['data'] = []
+config['data']['val']['data'] = []
 config['data']['test']['data'] = []
+
+for i in range(len(image_dirs)):
+    # 依次读取所有的目录
+    image_files = []
+    label_files = []
+    image_files.extend(sorted(glob.glob(os.path.join(image_dirs[i], "*.bmp"))))
+    label_files.extend(sorted(glob.glob(os.path.join(label_dirs[i], "*.png"))))
+
+    # 打乱文件列表
+    combined_files = list(zip(image_files, label_files))
+    random.shuffle(combined_files)
+    image_files, label_files = zip(*combined_files)
+
+    split_idx = int(len(image_files) * 0.8)
+
+    # 划分训练集和验证集（8:2）
+    config['data']['train']['data'].extend(
+        [
+            {'image': img, 'label': lbl} 
+            for img, lbl in zip(image_files[:split_idx], label_files[:split_idx])
+        ]
+    )
+    config['data']['val']['data'].extend(
+        [
+            {'image': img, 'label': lbl} 
+            for img, lbl in zip(image_files[split_idx:], label_files[split_idx:])
+        ]
+    )
 
 
 # ------------------- 配置文件检查 --------------------
