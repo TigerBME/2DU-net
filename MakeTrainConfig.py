@@ -11,6 +11,9 @@ import random
 config = get_default_config(config_name="config_13.json")
 # get_default_config()返回默认配置
 
+# ------------------- 额外修改配置 -------------------
+
+
 # ------------------- 日志数据配置 -------------------
 log_path = getpath('TRAIN_RECORD','record')
 config['logging']['log_dir'] = os.path.join("./", log_path)
@@ -38,12 +41,10 @@ else:
 
 # 定义四个子目录
 image_dirs = [os.path.join(data_path, "images"),
-              os.path.join(data_path, "newimages1"),
               os.path.join(data_path, "newimages2")
               ]
 
 label_dirs = [os.path.join(data_path, "labels"),
-                os.path.join(data_path, "newlabels1"),
                 os.path.join(data_path, "newlabels2")
               ]
 
@@ -59,6 +60,8 @@ for i in range(len(image_dirs)):
     image_files = []
     label_files = []
     image_files.extend(sorted(glob.glob(os.path.join(image_dirs[i], "*.bmp"))))
+    image_files.extend(sorted(glob.glob(os.path.join(image_dirs[i], "*.png"))))
+    label_files.extend(sorted(glob.glob(os.path.join(label_dirs[i], "*.bmp"))))
     label_files.extend(sorted(glob.glob(os.path.join(label_dirs[i], "*.png"))))
 
     # 打乱文件列表

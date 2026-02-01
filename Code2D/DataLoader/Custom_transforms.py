@@ -51,35 +51,48 @@ class AddGaussianNoise:
             noise = torch.randn_like(args[0]) * self.std + self.mean
             results = [x + noise for x in args]
             return results[0] if len(results) == 1 else tuple(results)
+        
         return args[0] if len(args) == 1 else tuple(args)
 
 
 class RandomEnhance:
-    def __init__(self, p: float = 0.5):
+    def __init__(self, p: float = 0.5, max_value: float = 2.0, enabel_color: bool = False):
         self.p = p
-        self.max_value = 2.0
+        self.max_value = max_value
+        self.enabel_color = enabel_color
 
     def __call__(self, *args):
         if len(args) > 2:
-            raise ValueError("There should not be more than 2 input tensors.")
+            raise ValueError(f"{__class__.__name__}:There should not be more than 2 input tensors.")
+        
+        if len(args) > 1:
+            raise ValueError(f"{__class__.__name__}:This is only for image, not for label.")
+        
         if random.random() < self.p:
             value = random.uniform(-self.max_value, self.max_value)
-            random_seed = random.randint(1, 4)
+            if self.enabel_color:
+                # 使用颜色增强
+                random_seed = random.randint(1, 4)
+            else:
+                # 灰度图，只使用亮度增强
+                random_seed = random.randint(1, 3)
             
             results = []
             for img in args:
                 if random_seed == 1:
                     enhancer = ImageEnhance.Brightness(img)
                 elif random_seed == 2:
-                    enhancer = ImageEnhance.Color(img)
+                    enhancer = ImageEnhance.Sharpness(img)
                 elif random_seed == 3:
                     enhancer = ImageEnhance.Contrast(img)
                 else:
-                    enhancer = ImageEnhance.Sharpness(img)
+                    enhancer = ImageEnhance.Color(img)
+
                 results.append(enhancer.enhance(value))
             
-            return results[0] if len(results) == 1 else tuple(results)
-        return args[0] if len(args) == 1 else tuple(args)
+            return results[0] 
+        # 不操作，直接返回
+        return args[0] 
 
 
 class RandomMask:
@@ -172,5 +185,46 @@ class RandomMask:
                               f"Supported types: numpy.ndarray, torch.Tensor, PIL.Image.Image")
 
         return results[0] if len(results) == 1 else tuple(results)  
+    
+
+class RandomGamma:
+    def __init__(self, p: float = 0.5, gamma_range: tuple = (0.7, 1.5)):
+        """
+        随机 Gamma 校正（非线性亮度调整）
+        :param p: 应用该增强的概率
+        :param gamma_range: Gamma 值的采样范围，(min, max)，通常 (0.7, 1.5)
+        """
+        self.p = p
+        self.gamma_min, self.gamma_max = gamma_range
+
+    def __call__(self, *args):
+        if len(args) > 2:
+            raise ValueError(f"{__class__.__name__}:There should not be more than 2 input tensors.")
+
+        if len(args) > 1:
+            raise ValueError(f"{__class__.__name__}:This is only for image, not for label.")
+
+        if torch.rand(1).item() < self.p:
+            # 只操作图像，不操作标签
+            gamma = torch.empty(1).uniform_(self.gamma_min, self.gamma_max).item()
+            img = args[0]
+            
+            # 假设输入 img 是 [H, W] 或 [1, H, W] 的 Tensor，值域为 [0, 255]
+            # 先归一化到 [0, 1]，做 Gamma，再恢复到 [0, 255]
+            was_uint8 = (img.dtype == torch.uint8)
+            if was_uint8:
+                img = img.float()
+            
+            img_norm = img / 255.0
+            img_gamma = torch.pow(img_norm.clamp(min=1e-8), gamma)  # 避免 0^gamma 导致 NaN
+            img_out = img_gamma * 255.0
+            img_out = torch.clamp(img_out, 0, 255)
+            
+            if was_uint8:
+                img_out = img_out.to(torch.uint8)
+            
+            return img_out
+        
+        return args[0]
     
 
