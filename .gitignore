@@ -13,6 +13,8 @@ __pycache__/
 # 忽略输出结果与日志
 /Records/
 /OUTPUTS/
+/TRAIN_RECORD/
+/PREDICT_OUTPUTS/
 /Temp/
 /DATA/
 

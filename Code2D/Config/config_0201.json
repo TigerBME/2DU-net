@@ -78,7 +78,7 @@
     "data": {
         "train": {
             "Use_dataenhance": true,
-            "data_per_picture": 10,
+            "data_per_picture": 16,
             "preprocess": [
                 {
                     "type": "Resize",
@@ -122,6 +122,14 @@
                     "target": "both"
                 },
                 {
+                    "type": "RandomEnhance",
+                    "params": {
+                        "p": 0.8,
+                        "max_value": 1.8
+                    },
+                    "target": "image"
+                },
+                {
                     "type": "ToTensor",
                     "target": "both"
                 },
@@ -131,14 +139,6 @@
                         "p": 0.5,
                         "mean": 0,
                         "var": 0.01
-                    },
-                    "target": "image"
-                },
-                {
-                    "type": "RandomEnhance",
-                    "params": {
-                        "p": 0.8,
-                        "max_value": 1.8
                     },
                     "target": "image"
                 }
