@@ -1,13 +1,20 @@
 from datetime import datetime
 
 def check_config(config):
+    train_data_size = len(config['data']['train']['data']) * config['data']['train']['data_per_picture']
+    val_data_size = len(config['data']['val']['data']) * config['data']['val']['data_per_picture']
+    test_data_size = len(config['data']['test']['data']) * config['data']['test']['data_per_picture']
+    train_dataloader_size = train_data_size // config['data']['train']['dataloader_args']['batch_size']
+    val_dataloader_size = val_data_size // config['data']['val']['dataloader_args']['batch_size']
+    test_dataloader_size = test_data_size // config['data']['test']['dataloader_args']['batch_size']
+
     config['statistics'] = {
-        'train_data_size': len(config['data']['train']['data'] * config['data']['train']['data_per_picture']),
-        'val_data_size': len(config['data']['val']['data'] * config['data']['val']['data_per_picture']),
-        'test_data_size': len(config['data']['test']['data'] * config['data']['test']['data_per_picture']),
-        'train_dataloader_size': len(config['data']['train']['data']) // config['data']['train']['dataloader_args']['batch_size'],
-        'val_dataloader_size': len(config['data']['val']['data']) // config['data']['val']['dataloader_args']['batch_size'],
-        'test_dataloader_size': len(config['data']['test']['data']) // config['data']['test']['dataloader_args']['batch_size'],
+        'train_data_size' : train_data_size,
+        'val_data_size' : val_data_size,
+        'test_data_size' : test_data_size,
+        'train_dataloader_size' : train_dataloader_size,
+        'val_dataloader_size' : val_dataloader_size,
+        'test_dataloader_size' : test_dataloader_size,
         'Creat_time': datetime.now().strftime('%Y-%m-%d %H:%M:%S')
     }
 
