@@ -44,6 +44,8 @@ def train_model(train_config: dict, model: torch.nn.Module,
         model.train()
         optimizer.zero_grad()
         
+        print(f"\nEpoch {epoch+1}/{epochs}")
+
         # 学习率热身阶段
         if warm_up_epochs and epoch < warm_up_epochs:
             _warmup_lr(optimizer=optimizer, base_lr=base_lr, 
@@ -88,7 +90,7 @@ def train_model(train_config: dict, model: torch.nn.Module,
         print(f"the train will early stop in \
               {early_stop_return_config.pop('patience_left')} epochs")
         
-        print(f"the progress is {early_stop_return_config.pop('progress')}")
+        # print(f"the progress is {early_stop_return_config.pop('progress')}")
 
         # 如果有新最佳分数，记录日志
         if early_stop_return_config.pop('best_epoch', 0) == epoch+1:
@@ -109,6 +111,7 @@ def train_model(train_config: dict, model: torch.nn.Module,
             else:
                 # 其他调度器只需简单调用 step()
                 scheduler.step()
+
 
 def _train_epoch(model, 
                  loader, 
