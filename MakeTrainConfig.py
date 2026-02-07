@@ -10,10 +10,10 @@ from Code2D import model_train
 from Code2D import get_default_config
 
 
-def setup_logging_paths(config: Dict, fold_index: int) -> str:
+def setup_logging_paths(config: Dict, fold_index: int, main_record_path: str) -> str:
     """更新配置中的日志路径并返回 log_path，每个fold使用不同的路径。"""
-    log_path = getpath(f'TRAIN_RECORD_fold_{fold_index}', f'record_fold_{fold_index}')
-    config['logging']['log_dir'] = os.path.join("./", log_path)
+    log_path = os.path.join(main_record_path, f'record_fold_{fold_index+1}')
+    config['logging']['log_dir'] = log_path
     config['early_stopping']['model_save_path'] = os.path.join(log_path, "best_model.pth")
     return log_path
 
@@ -66,7 +66,7 @@ def populate_config_datasets_fold(config: Dict, train_indices: List[int], val_in
     """清空并填充 config 中的 train/val 数据列表，根据给定的索引划分数据。"""
     config['data']['train']['data'] = []
     config['data']['val']['data'] = []
-    config['data']['test']['data'] = []  # 测试集保持为空，或从训练集中划分
+    config['data']['test']['data'] = [] 
     
     # 填充训练集
     for idx in train_indices:
@@ -102,6 +102,10 @@ def make_k_fold_configs(k: int) -> List[str]:
 
     print(f"一共 {len(all_pairs)} 组数据用于K折交叉验证。")
     
+    # 选取保存训练数据的文件夹
+    main_record_path = getpath(os.path.join(os.path.dirname(os.path.abspath(__file__)), "TRAIN_RECORD"), "record")
+    os.makedirs(main_record_path, exist_ok=True)
+
     # 初始化K折分割器
     kf = KFold(n_splits=k, shuffle=True, random_state=42)
     
@@ -117,7 +121,7 @@ def make_k_fold_configs(k: int) -> List[str]:
         fold_config = json.loads(json.dumps(base_config))  # 深拷贝配置
         
         # 设置当前fold的日志路径
-        log_path = setup_logging_paths(fold_config, fold_idx)
+        log_path = setup_logging_paths(fold_config, fold_idx, main_record_path)
         
         # 根据当前fold的索引划分数据
         populate_config_datasets_fold(fold_config, train_indices, val_indices, all_pairs)
