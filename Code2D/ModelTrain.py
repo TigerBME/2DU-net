@@ -22,29 +22,30 @@ def load_config(config_path):
     with open(config_path) as f:
         return json.load(f)
 
-def main(config_path, record_path=None, interactive=True):
+def main(config_path: str, record_path=None, check_time: bool = True):
     # 加载配置
     config = load_config(config_path)
 
     # 检查配置创建时间（与之前命令行行为保持一致）
-    try:
-        create_time_str = config['statistics']['Creat_time']
-        create_time = datetime.datetime.strptime(create_time_str, "%Y-%m-%d %H:%M:%S")
-        current_time = datetime.datetime.now()
-        time_diff = current_time - create_time
-        if time_diff.total_seconds() > 300:  # 超过5分钟
-            print(f"警告：config文件创建于{time_diff.seconds//60}分钟{time_diff.seconds%60}秒前")
+    if check_time:
+        try:
+            create_time_str = config['statistics']['Creat_time']
+            create_time = datetime.datetime.strptime(create_time_str, "%Y-%m-%d %H:%M:%S")
+            current_time = datetime.datetime.now()
+            time_diff = current_time - create_time
+            if time_diff.total_seconds() > 300:  # 超过5分钟
+                print(f"警告：config文件创建于{time_diff.seconds//60}分钟{time_diff.seconds%60}秒前")
 
-            print("按Enter键继续运行，其他键退出...")
-            user_input = input()
-            if user_input != "":
-                print("程序终止")
-                return
-        else:
-            print(f"config为{time_diff.seconds//60}分钟{time_diff.seconds%60}秒之前创建，可以运行")
-    except Exception:
-        # 如果配置中没有 statistics 信息，继续运行但给出提示
-        print("配置中无创建时间信息，跳过时间检查")
+                print("按Enter键继续运行，其他键退出...")
+                user_input = input()
+                if user_input != "":
+                    print("程序终止")
+                    return
+            else:
+                print(f"config为{time_diff.seconds//60}分钟{time_diff.seconds%60}秒之前创建，可以运行")
+        except Exception:
+            # 如果配置中没有 statistics 信息，继续运行但给出提示
+            print("配置中无创建时间信息，跳过时间检查")
     
     # 设置设备
     device = torch_device('cuda' if cuda_available() else 'cpu')

@@ -155,7 +155,7 @@ def run_train_config(configs_list: list[str], k: int, auto_run: bool = False) ->
         for i in range(k):
             config_path = configs_list[i]
             print(f"正在训练第 {i+1}/{k} 折,配置文件路径: {config_path}...")
-            model_train(config_path)
+            model_train(config_path, check_time=False)  # 跳过时间检查
 
         return
 
@@ -167,7 +167,7 @@ def run_train_config(configs_list: list[str], k: int, auto_run: bool = False) ->
             for i in range(k):
                 config_path = configs_list[i]
                 print(f"正在训练第 {i+1}/{k} 折,配置文件路径: {config_path}...")
-                model_train(config_path)
+                model_train(config_path, check_time=False)  # 跳过时间检查
             break
         if user_input == 'N':
             # 不执行训练
