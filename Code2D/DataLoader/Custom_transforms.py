@@ -55,45 +55,72 @@ class AddGaussianNoise:
         return args[0] if len(args) == 1 else tuple(args)
 
 
+
 class RandomEnhance:
-    def __init__(self, p: float = 0.5, max_value: float = 2.0, enabel_color: bool = False):
+    def __init__(self, p: float = 0.8, 
+                 brightness_range: tuple = (0.8, 1.2), 
+                 sharpness_range: tuple = (0.8, 1.2), 
+                 gamma_range: tuple = (0.5, 1.5), 
+                 color_range: tuple = (0.8, 1.2), 
+                 enable_color: bool = False):
+        """
+        随机图像增强类，支持亮度、锐度、伽马校正和颜色增强。
+        
+        :param p: 应用增强的概率。
+        :param brightness_range: 亮度增强的取值范围，默认(0.8, 1.2)。
+        :param sharpness jadxe: 锐度增强的取值范围，默认(0.8, 1.2)。
+        :param gamma_range: 伽马校正的取值范围，默认(0.5, 1.5)，值越大图片越亮。
+        :param color_range: 颜色增强的取值范围，默认(0.8, 1.2)。
+        :param enable_color: 是否启用颜色增强，默认False。
+        """
         self.p = p
-        self.max_value = max_value
-        self.enabel_color = enabel_color
+        self.brightness_range = brightness_range
+        self.sharpness_range = sharpness_range
+        self.gamma_range = gamma_range
+        self.color_range = color_range
+        self.enable_color = enable_color
 
-    def __call__(self, *args):
-        if len(args) > 2:
-            raise ValueError(f"{__class__.__name__}:There should not be more than 2 input tensors.")
+    def gamma_correction(self, img: Image.Image, gamma_value: float) -> Image.Image:
+        """
+        伽马校正，支持灰度图（'L'）和彩色图（'RGB'）。
         
+        :param img: 输入图像（PIL Image，mode='L' 或 'RGB'）。
+        :param gamma_value: 伽马校正值（>0）。
+        :return: 伽马校正后的图像，保持原 mode。
+        """
+        max_val = 255.0
+        # 使用 point 应用于所有通道（灰度单通道或 RGB 三通道）
+        return img.point(lambda p: int(max_val * ((p / max_val) ** gamma_value)))
+
+    def __call__(self, *args) -> Image.Image:
+
         if len(args) > 1:
-            raise ValueError(f"{__class__.__name__}:This is only for image, not for label.")
-        
+            raise ValueError("There should not be more than 1 input tensor.")
+
+        img = args[0]
+
         if random.random() < self.p:
-            value = random.uniform(-self.max_value, self.max_value)
-            if self.enabel_color:
-                # 使用颜色增强
-                random_seed = random.randint(1, 4)
+            value_ranges = [self.brightness_range, 
+                            self.sharpness_range, 
+                            self.gamma_range]
+            if self.enable_color:
+                value_ranges.append(self.color_range)
+            
+            random_seed = random.randint(0, len(value_ranges)-1)
+            value = random.uniform(*value_ranges[random_seed])
+            
+            if random_seed == 0:
+                enhancer = ImageEnhance.Brightness(img)
+            elif random_seed == 1:
+                enhancer = ImageEnhance.Sharpness(img)
+            elif random_seed == 2:
+                return self.gamma_correction(img, value)
             else:
-                # 灰度图，只使用亮度增强
-                random_seed = random.randint(1, 3)
-            
-            results = []
-            for img in args:
-                if random_seed == 1:
-                    enhancer = ImageEnhance.Brightness(img)
-                elif random_seed == 2:
-                    enhancer = ImageEnhance.Sharpness(img)
-                elif random_seed == 3:
-                    enhancer = ImageEnhance.Contrast(img)
-                else:
-                    enhancer = ImageEnhance.Color(img)
+                enhancer = ImageEnhance.Color(img)
+                
+            img = enhancer.enhance(value)
 
-                results.append(enhancer.enhance(value))
-            
-            return results[0] 
-        # 不操作，直接返回
-        return args[0] 
-
+        return img
 
 class RandomMask:
     def __init__(self, 

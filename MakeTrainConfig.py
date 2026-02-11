@@ -92,7 +92,7 @@ def make_k_fold_configs(k: int) -> List[str]:
     """"""
     print(f"执行 {k}-折交叉验证...")
     device = "cuda" if cuda_available() else "cpu"
-    base_config = get_default_config(config_name="config_13.json")
+    base_config = get_default_config(config_name="config_0211.json")
 
     data_path = get_data_base_path(device)
     image_dirs, label_dirs = build_image_label_dirs(data_path)
