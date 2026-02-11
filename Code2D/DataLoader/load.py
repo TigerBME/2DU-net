@@ -100,7 +100,8 @@ def get_dataloader(data_config:dict, mode:str):
         # 创建DataLoader
         loader = DataLoader(
             dataset,
-            **data_config['dataloader_args']
+            **data_config['dataloader_args'],
+            shuffle=True
         )
         return loader
     
